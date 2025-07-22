@@ -8,16 +8,29 @@ datasource db {
 }
 
 model Usuario {
-  id        Int       @id @default(autoincrement())
-  nome      String    @db.VarChar(50)
-  cargo     CargoEnum @default(PROFESSOR)
-  email     String    @unique
-  senha     String
-  idExterno String    @unique @default(uuid()) @map("id_externo")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id                        Int           @id @default(autoincrement())
+  nome                      String        @db.VarChar(50)
+  cargo                     CargoEnum     @default(PROFESSOR)
+  email                     String        @unique
+  senha                     String
+  idExterno                 String        @unique @default(uuid()) @map("id_externo")
+  createdAt                 DateTime      @default(now()) @map("created_at")
+  updatedAt                 DateTime      @updatedAt @map("updated_at")
+  laboratoriosAdministrados Laboratorio[]
 
   @@map("usuarios")
+}
+
+model Laboratorio {
+  codigo        Int      @id @default(autoincrement())
+  nome          String   @db.VarChar(50)
+  descricao     String?
+  responsavelId Int      @map("responsavel_id")
+  responsavel   Usuario  @relation(fields: [responsavelId], references: [id])
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("laboratorios")
 }
 
 enum CargoEnum {
