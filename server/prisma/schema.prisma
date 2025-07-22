@@ -8,15 +8,18 @@ datasource db {
 }
 
 model Usuario {
-  id                        Int           @id @default(autoincrement())
-  nome                      String        @db.VarChar(50)
-  cargo                     CargoEnum     @default(PROFESSOR)
-  email                     String        @unique
-  senha                     String
-  idExterno                 String        @unique @default(uuid()) @map("id_externo")
-  createdAt                 DateTime      @default(now()) @map("created_at")
-  updatedAt                 DateTime      @updatedAt @map("updated_at")
-  laboratoriosAdministrados Laboratorio[]
+  id        Int       @id @default(autoincrement())
+  nome      String    @db.VarChar(50)
+  cargo     CargoEnum @default(PROFESSOR)
+  email     String    @unique
+  senha     String
+  idExterno String    @unique @default(uuid()) @map("id_externo")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  LaboratoriosAdministrados Laboratorio[]
+  ManutencoesSolicitadas    Manutencao[]  @relation("UsuarioSolicitou")
+  ManutencoesFeitas         Manutencao[]  @relation("TecnicoResponsavel")
 
   @@map("usuarios")
 }
@@ -26,15 +29,46 @@ model Laboratorio {
   nome          String   @db.VarChar(50)
   descricao     String?
   responsavelId Int      @map("responsavel_id")
-  responsavel   Usuario  @relation(fields: [responsavelId], references: [id])
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
+  responsavel Usuario @relation(fields: [responsavelId], references: [id])
+
   @@map("laboratorios")
+}
+
+model Manutencao {
+  codigo                  Int              @id @default(autoincrement())
+  prazo                   DateTime
+  status                  StatusManutencao @default(SOLICITADA)
+  tipo                    TipoManutencao   @default(CORRETIVA)
+  descricaoSolicitada     String
+  descricaoAposFinalizada String?
+  usuarioSolicitacaoId    Int              @map("usuario_solicitacao_id")
+  tecnicoResponsavelId    Int              @map("tecnico_responsavel_id")
+  dataSolicitada          DateTime         @default(now()) @map("data_solicitada")
+  updatedAt               DateTime         @updatedAt @map("updated_at")
+
+  usuarioSolicitou   Usuario @relation("UsuarioSolicitou", fields: [usuarioSolicitacaoId], references: [id])
+  tecnicoResponsavel Usuario @relation("TecnicoResponsavel", fields: [tecnicoResponsavelId], references: [id])
+
+  @@map("manutencoes")
 }
 
 enum CargoEnum {
   PROFESSOR
   COORDENADOR
   TECNICO
+}
+
+enum TipoManutencao {
+  PREVENTIVA
+  CORRETIVA
+}
+
+enum StatusManutencao {
+  SOLICITADA
+  CANCELADA
+  CONCLUIDA
+  PENDENTE
 }
