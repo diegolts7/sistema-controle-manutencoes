@@ -2,3 +2,4 @@ node_modules
 .env
 coverage
 /server/src/generated/prisma
+package-lock.json
