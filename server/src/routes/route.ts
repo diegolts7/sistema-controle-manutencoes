@@ -8,6 +8,7 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
 
 const app = fastify({
   logger: true,
@@ -42,7 +43,9 @@ app.register(fastifySwaggerUi, {
   routePrefix: "/api/docs",
 });
 
-const routes = () => {};
+const routes = () => {
+  app.register(autenticacaoRotas, { prefix: "/auth" });
+};
 
 app.register(routes, { prefix: "/api" });
 
