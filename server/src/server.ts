@@ -1,12 +1,12 @@
 import { config } from "dotenv";
-import { conectarPrisma } from "./config/db/conectarPrismaAoBanco";
 import app from "./routes/route";
+import { conectarPrisma, prisma } from "./services/prisma/prisma";
 
 config();
 
-conectarPrisma().then(() => {
+conectarPrisma(prisma).then(() => {
   app.listen({
-    port: Number(process.env.PORT) || 5000,
+    port: Number(process.env.PORT!),
     host: "0.0.0.0",
   });
   console.log("server rodando");

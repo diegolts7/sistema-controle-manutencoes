@@ -8,51 +8,83 @@ datasource db {
 }
 
 model Usuario {
-  id        Int       @id @default(autoincrement())
-  nome      String    @db.VarChar(50)
-  cargo     CargoEnum @default(PROFESSOR)
-  email     String    @unique
-  senha     String
-  idExterno String    @unique @default(uuid()) @map("id_externo")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(50)
+  cargo         CargoEnum @default(PROFESSOR)
+  email         String    @unique
+  senha         String
+  idExterno     String    @unique @default(uuid()) @map("id_externo")
+  instituicaoId Int       @map("instituicao_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
+  VinculoInstituicao        InstituicaoEnsino @relation(fields: [instituicaoId], references: [id])
   LaboratoriosAdministrados Laboratorio[]
-  ManutencoesSolicitadas    Manutencao[]  @relation("UsuarioSolicitou")
-  ManutencoesFeitas         Manutencao[]  @relation("TecnicoResponsavel")
+  ManutencoesSolicitadas    Manutencao[]      @relation("UsuarioSolicitou")
+  ManutencoesFeitas         Manutencao[]      @relation("TecnicoResponsavel")
 
   @@map("usuarios")
 }
 
+model InstituicaoEnsino {
+  id        Int      @id @default(autoincrement())
+  nome      String   @db.VarChar(50)
+  cnpj      String   @unique
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  UsuariosVinculados Usuario[]
+
+  @@map("intituicoes_ensino")
+}
+
 model Laboratorio {
-  codigo        Int      @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   nome          String   @db.VarChar(50)
   descricao     String?
   responsavelId Int      @map("responsavel_id")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  responsavel Usuario @relation(fields: [responsavelId], references: [id])
+  Responsavel          Usuario      @relation(fields: [responsavelId], references: [id])
+  ManutencoesRecebidas Manutencao[]
 
   @@map("laboratorios")
 }
 
 model Manutencao {
-  codigo                  Int              @id @default(autoincrement())
+  id                      Int              @id @default(autoincrement())
   prazo                   DateTime
   status                  StatusManutencao @default(SOLICITADA)
   tipo                    TipoManutencao   @default(CORRETIVA)
-  descricaoSolicitada     String
-  descricaoAposFinalizada String?
+  descricaoSolicitada     String           @db.Text
+  descricaoAposFinalizada String?          @db.Text
   usuarioSolicitacaoId    Int              @map("usuario_solicitacao_id")
   tecnicoResponsavelId    Int              @map("tecnico_responsavel_id")
+  laboratorioId           Int              @map("laboratorio_id")
   dataSolicitada          DateTime         @default(now()) @map("data_solicitada")
   updatedAt               DateTime         @updatedAt @map("updated_at")
 
-  usuarioSolicitou   Usuario @relation("UsuarioSolicitou", fields: [usuarioSolicitacaoId], references: [id])
-  tecnicoResponsavel Usuario @relation("TecnicoResponsavel", fields: [tecnicoResponsavelId], references: [id])
+  ImagensManutencao     ImagemManutencao[]
+  LaboratorioManutencao Laboratorio        @relation(fields: [laboratorioId], references: [id])
+  UsuarioSolicitou      Usuario            @relation("UsuarioSolicitou", fields: [usuarioSolicitacaoId], references: [id])
+  TecnicoResponsavel    Usuario            @relation("TecnicoResponsavel", fields: [tecnicoResponsavelId], references: [id])
 
   @@map("manutencoes")
+}
+
+model ImagemManutencao {
+  id           Int    @id @default(autoincrement())
+  manutencaoId Int    @map("manutencao_id")
+  url          String
+  nome         String
+
+  ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id])
+
+  @@unique([nome, manutencaoId])
+  @@map("imagens_manutencao")
 }
 
 enum CargoEnum {
