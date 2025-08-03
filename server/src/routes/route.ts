@@ -16,6 +16,11 @@ const app = fastify({
   logger: true,
 }).withTypeProvider<ZodTypeProvider>();
 
+app.register(fastifyCors, {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+});
+
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
@@ -56,10 +61,5 @@ const routes = () => {
 app.register(routes, { prefix: "/api" });
 
 app.setErrorHandler(errorMiddleware);
-
-app.register(fastifyCors, {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-});
 
 export default app;

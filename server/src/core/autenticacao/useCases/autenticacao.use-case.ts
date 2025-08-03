@@ -10,6 +10,7 @@ import {
 import bcrypt from "bcrypt";
 import app from "../../../routes/route";
 import { Payload } from "../entity/autenticacao.entity";
+import { verificarSeTokenEhValido } from "../../../middlewares/auth/verificar-token";
 
 export class AutenticacaoUseCase {
   constructor(private readonly usuarioRepository: UsuarioRepositoryPrisma) {}
@@ -32,6 +33,14 @@ export class AutenticacaoUseCase {
     });
 
     return tokens;
+  };
+
+  atualizarToken = async (refresh: string) => {
+    const payload = await verificarSeTokenEhValido(refresh);
+
+    const novosTokens = this.createTokens(payload);
+
+    return novosTokens;
   };
 
   createTokens = (payload: Payload) => {

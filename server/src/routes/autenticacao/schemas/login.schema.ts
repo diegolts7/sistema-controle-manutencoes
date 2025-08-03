@@ -16,7 +16,7 @@ const schemaParaReceberNoLogin = z.object({
     .min(6, "A senha deve ter pelo menos 6 caracteres"),
 });
 
-const schemaTokensEnviados = z.object({
+export const schemaTokensEnviados = z.object({
   access: z.string(),
   refresh: z.string(),
 });
@@ -32,4 +32,3 @@ export const loginSchema: FastifySchema = {
 };
 
 export type ConteudoLogin = z.infer<typeof schemaParaReceberNoLogin>;
-export type ConteudoToken = z.infer<typeof schemaTokensEnviados>;

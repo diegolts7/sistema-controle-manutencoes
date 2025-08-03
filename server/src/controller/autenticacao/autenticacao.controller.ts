@@ -5,6 +5,9 @@ import {
   autenticacaoUseCase,
   AutenticacaoUseCase,
 } from "../../core/autenticacao/useCases/autenticacao.use-case";
+import { ConteudoVerificarToken } from "../../routes/autenticacao/schemas/verificar-token.schema";
+import { verificarSeTokenEhValido } from "../../middlewares/auth/verificar-token";
+import { ConteudoAtualizarToken } from "../../routes/autenticacao/schemas/atualizar-token.schema";
 
 class AutenticacaoController {
   constructor(private readonly autenticacaoUseCase: AutenticacaoUseCase) {}
@@ -22,9 +25,27 @@ class AutenticacaoController {
     reply.status(HTTP_STATUS.SUCCESS).send(tokens);
   };
 
-  verificarToken = async (request: FastifyRequest, reply: FastifyReply) => {};
+  verificarToken = async (
+    request: FastifyRequest<{ Body: ConteudoVerificarToken }>,
+    reply: FastifyReply
+  ) => {
+    const { access } = request.body;
 
-  atualizarToken = async (request: FastifyRequest, reply: FastifyReply) => {};
+    await verificarSeTokenEhValido(access);
+
+    reply.status(HTTP_STATUS.SUCCESS).send();
+  };
+
+  atualizarToken = async (
+    request: FastifyRequest<{ Body: ConteudoAtualizarToken }>,
+    reply: FastifyReply
+  ) => {
+    const { refresh } = request.body;
+
+    const novosTokens = await this.autenticacaoUseCase.atualizarToken(refresh);
+
+    reply.status(HTTP_STATUS.SUCCESS).send(novosTokens);
+  };
 }
 
 export const autenticacaoController = new AutenticacaoController(
