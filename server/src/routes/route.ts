@@ -9,6 +9,8 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
+import { errorMiddleware } from "../middlewares/error/erro.middleware";
+import fastifyJwt from "@fastify/jwt";
 
 const app = fastify({
   logger: true,
@@ -43,11 +45,17 @@ app.register(fastifySwaggerUi, {
   routePrefix: "/api/docs",
 });
 
+app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET!,
+});
+
 const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
 };
 
 app.register(routes, { prefix: "/api" });
+
+app.setErrorHandler(errorMiddleware);
 
 app.register(fastifyCors, {
   origin: "*",
