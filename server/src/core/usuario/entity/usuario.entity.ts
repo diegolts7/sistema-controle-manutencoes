@@ -13,11 +13,11 @@ export type TipoUsuario = {
   updatedAt: Date;
 };
 
-export type TipoUsuarioPublico = Omit<TipoUsuario, "id">;
+export type TipoUsuarioPublico = Omit<TipoUsuario, "id" | "senha">;
 
 export type TipoCriarUsuario = Omit<
-  TipoUsuarioPublico,
-  "idExterno" | "createdAt" | "updatedAt"
+  TipoUsuario,
+  "id" | "idExterno" | "createdAt" | "updatedAt" | "VinculoInstituicao"
 > & {
   cargo?: CargoEnum;
   ativo?: boolean;

@@ -4,6 +4,7 @@ import {
   TipoCriarUsuario,
   TipoEditarUsuario,
   TipoUsuario,
+  TipoUsuarioPublico,
 } from "../../../core/usuario/entity/usuario.entity";
 
 const USUARIOS_ZERADOS = 0;
@@ -13,11 +14,6 @@ export class UsuarioRepositoryPrisma {
 
   existeUsuario = async (data: Partial<TipoUsuario>): Promise<boolean> => {
     const count = await this.prismaService.usuario.count({ where: data });
-    return count > USUARIOS_ZERADOS;
-  };
-
-  existeUsuarioPorEmail = async (email: string): Promise<boolean> => {
-    const count = await this.prismaService.usuario.count({ where: { email } });
     return count > USUARIOS_ZERADOS;
   };
 
@@ -39,12 +35,23 @@ export class UsuarioRepositoryPrisma {
 
   buscarUsuariosPorCondicao = async (
     data: Partial<TipoUsuario> = {}
-  ): Promise<TipoUsuario[]> => {
-    return await this.prismaService.usuario.findMany({ where: data });
+  ): Promise<TipoUsuarioPublico[]> => {
+    return await this.prismaService.usuario.findMany({
+      where: data,
+      omit: {
+        senha: true,
+        id: true,
+      },
+    });
   };
 
-  buscarTodosUsuarios = async () => {
-    return await this.buscarUsuariosPorCondicao();
+  buscarUsuariosAtivosPorCondicao = async (
+    data: Partial<Omit<TipoUsuario, "ativo">> = {}
+  ) => {
+    return await this.buscarUsuariosPorCondicao({
+      ...data,
+      ativo: true,
+    });
   };
 
   criarUsuario = async (

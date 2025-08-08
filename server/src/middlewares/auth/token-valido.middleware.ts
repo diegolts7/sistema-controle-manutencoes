@@ -15,4 +15,5 @@ export const tokenValidoMiddleware = async (
   const payload = await verificarSeTokenEhValido(token);
 
   request.user = payload;
+  return;
 };
