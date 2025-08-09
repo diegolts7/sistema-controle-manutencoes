@@ -1,3 +1,6 @@
+import { CargoEnum } from "../../usuario/entity/usuario.entity";
+
 export type Payload = {
-  userId: String;
+  userId: string;
+  role: CargoEnum;
 };

@@ -4,7 +4,8 @@ import { UnauthorizedError } from "../../utils/helpers/api-error.helpers";
 
 export const tokenValidoMiddleware = async (
   request: FastifyRequest,
-  _reply: FastifyReply
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  reply: FastifyReply
 ) => {
   const token = request.headers.authorization?.replace("Bearer ", "");
 
@@ -12,7 +13,8 @@ export const tokenValidoMiddleware = async (
     throw new UnauthorizedError("Token não fornecido");
   }
 
-  const { userId } = await verificarSeTokenEhValido(token);
+  const payload = await verificarSeTokenEhValido(token);
 
-  request.user = userId;
+  request.user = payload;
+  return;
 };
