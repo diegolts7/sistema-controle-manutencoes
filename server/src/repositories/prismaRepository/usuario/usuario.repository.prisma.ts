@@ -56,8 +56,14 @@ export class UsuarioRepositoryPrisma {
 
   criarUsuario = async (
     data: TipoCriarUsuario
-  ): Promise<TipoUsuario | null> => {
-    return await this.prismaService.usuario.create({ data });
+  ): Promise<TipoUsuarioPublico | null> => {
+    return await this.prismaService.usuario.create({
+      data,
+      omit: {
+        senha: true,
+        id: true,
+      },
+    });
   };
 
   editarUsuario = async (

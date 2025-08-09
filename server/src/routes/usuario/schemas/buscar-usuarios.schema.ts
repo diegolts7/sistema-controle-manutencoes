@@ -6,7 +6,7 @@ const queryBuscarUsuarios = z.object({
   search: z.string().optional(),
 });
 
-const usuarioPublicoSchema = z.object({
+export const usuarioPublicoSchema = z.object({
   nome: z.string(),
   cargo: z.nativeEnum(CargoEnum),
   email: z.string().email(),

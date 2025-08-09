@@ -6,8 +6,9 @@ export const verificarSeTokenEhValido = async (
   token: string
 ): Promise<Payload> => {
   try {
-    return app.jwt.verify(token);
-  } catch (err) {
+    return await app.jwt.verify(token);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     throw new UnauthorizedError("Token inválido ou ausente");
   }
 };
