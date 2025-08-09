@@ -9,6 +9,7 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
+import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.route";
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 
@@ -56,6 +57,7 @@ app.register(fastifyJwt, {
 
 const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
+  app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
 };
 
 app.register(routes, { prefix: "/api" });
