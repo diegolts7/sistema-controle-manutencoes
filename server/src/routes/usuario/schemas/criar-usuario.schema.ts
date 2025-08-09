@@ -3,7 +3,7 @@ import { FastifySchema } from "fastify";
 import { z } from "zod";
 import { usuarioPublicoSchema } from "./buscar-usuarios.schema";
 
-const criarUsuarioBody = z.object({
+export const criarUsuarioBody = z.object({
   nome: z.string(),
   cargo: z.nativeEnum(CargoEnum).optional().default("PROFESSOR"),
   email: z.string().email(),
@@ -22,4 +22,4 @@ export const criarUsuarioSchema: FastifySchema = {
   security: [{ BearerAuth: [] }],
 };
 
-export type BodyCriarUsuario = z.infer<typeof criarUsuarioBody>;
+export type ConteudoCriarUsuario = z.infer<typeof criarUsuarioBody>;

@@ -2,15 +2,16 @@ import { ConteudoLogin } from "../../../routes/autenticacao/schemas/login.schema
 import {
   BadRequestError,
   NotFoundError,
+  UnauthorizedError,
 } from "../../../utils/helpers/api-error.helpers";
 import {
   usuarioRepositoryPrisma,
   UsuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
-import bcrypt from "bcrypt";
 import app from "../../../routes/route";
 import { Payload } from "../entity/autenticacao.entity";
 import { verificarSeTokenEhValido } from "../../../middlewares/auth/verificar-token";
+import { bcryptService } from "../../../services/bcrypt/bcrypt-service";
 
 export class AutenticacaoUseCase {
   constructor(private readonly usuarioRepository: UsuarioRepositoryPrisma) {}
@@ -19,10 +20,18 @@ export class AutenticacaoUseCase {
     const usuario = await this.usuarioRepository.buscarPorEmail(email);
 
     if (!usuario) {
-      throw new NotFoundError("usuario nao existe, cadastre-se!");
+      throw new NotFoundError("Usuario nao existe, cadastre-se!");
     }
 
-    const checkPassword = await bcrypt.compare(senha, usuario.senha);
+    if (!usuario.ativo)
+      throw new UnauthorizedError(
+        "Usuário inativo. Entre em contato com o coordenador."
+      );
+
+    const checkPassword = await bcryptService.compararSenhas(
+      senha,
+      usuario.senha
+    );
 
     if (!checkPassword) {
       throw new BadRequestError("A senha está incorreta, tente outra vez.");

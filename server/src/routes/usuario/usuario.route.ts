@@ -5,6 +5,8 @@ import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middl
 import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-cargo.middleware";
 import { buscarUsuariosSchema } from "./schemas/buscar-usuarios.schema";
 import { criarUsuarioSchema } from "./schemas/criar-usuario.schema";
+import { buscarUsuarioPorIdSchema } from "./schemas/buscar-usuario-por-id.schema";
+import { editarUsuarioSchema } from "./schemas/editar-usuario.schema";
 
 export const usuarioRotas = (app: FastifyTypedInstance) => {
   app.post(
@@ -24,6 +26,23 @@ export const usuarioRotas = (app: FastifyTypedInstance) => {
     { schema: buscarUsuariosSchema, preHandler: tokenValidoMiddleware },
     usuarioController.buscarUsuarios
   );
-  //   app.patch("/", () => {});
+
+  app.get(
+    "/:id",
+    { schema: buscarUsuarioPorIdSchema, preHandler: tokenValidoMiddleware },
+    usuarioController.buscarUsuarioPorId
+  );
+
+  app.patch(
+    "/:id",
+    {
+      schema: editarUsuarioSchema,
+      preHandler: [
+        tokenValidoMiddleware,
+        verificarCargoMiddleware([CargoEnum.COORDENADOR]),
+      ],
+    },
+    usuarioController.editarUsuario
+  );
   //   app.patch("/desativar", () => {});
 };

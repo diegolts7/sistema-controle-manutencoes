@@ -4,6 +4,10 @@ import { z } from "zod";
 
 const queryBuscarUsuarios = z.object({
   search: z.string().optional(),
+  inativos: z
+    .string()
+    .optional()
+    .transform((valor) => valor === "true"),
 });
 
 export const usuarioPublicoSchema = z.object({
@@ -19,7 +23,8 @@ export const usuarioPublicoSchema = z.object({
 
 export const buscarUsuariosSchema: FastifySchema = {
   tags: ["user"],
-  description: "Rota para buscar usuários por nome ou e-mail.",
+  description:
+    "Rota para buscar usuários do sistema podendo filtrar por nome e e-mail.",
   querystring: queryBuscarUsuarios,
   response: {
     200: z.array(usuarioPublicoSchema),
@@ -28,4 +33,3 @@ export const buscarUsuariosSchema: FastifySchema = {
 };
 
 export type QueryBuscarUsuarios = z.infer<typeof queryBuscarUsuarios>;
-export type TipoUsuarioPublico = z.infer<typeof usuarioPublicoSchema>;

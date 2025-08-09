@@ -2,16 +2,17 @@ import {
   usuarioRepositoryPrisma,
   UsuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
-import { TipoCriarUsuario } from "../entity/usuario.entity";
-import bcrypt from "bcrypt";
-
-const SALT_SENHA = 10;
+import { bcryptService } from "../../../services/bcrypt/bcrypt-service";
+import { NotFoundError } from "../../../utils/helpers/api-error.helpers";
+import { TipoCriarUsuario, TipoEditarUsuario } from "../entity/usuario.entity";
 
 export class UsuarioUseCase {
   constructor(private readonly usuarioRepository: UsuarioRepositoryPrisma) {}
 
   criarUsuario = async (usuario: TipoCriarUsuario) => {
-    const senhaCriptografada = bcrypt.hashSync(usuario.senha, SALT_SENHA);
+    const senhaCriptografada = await bcryptService.gerarHashSenha(
+      usuario.senha
+    );
 
     const usuarioCriado = await this.usuarioRepository.criarUsuario({
       ...usuario,
@@ -21,15 +22,34 @@ export class UsuarioUseCase {
     return usuarioCriado;
   };
 
-  buscarUsuarios = async (search?: string) => {
-    const parametroBuscaUsuarios = search ? search : {};
+  buscarUsuarioPorId = async (idExterno: string) => {
+    const usuario = await this.usuarioRepository.buscarPorIdExterno(idExterno);
 
-    const usuarios =
-      await this.usuarioRepository.buscarUsuariosAtivosPorCondicao(
-        parametroBuscaUsuarios
-      );
+    if (!usuario) {
+      throw new NotFoundError("Usuario com esse id não existe no banco.");
+    }
+
+    return usuario;
+  };
+
+  buscarUsuarios = async (search?: string, inativos: boolean = false) => {
+    const filtroPorUsuarioAtivoOuNao = inativos ? {} : { ativo: true };
+
+    const usuarios = search
+      ? await this.usuarioRepository.buscarUsuariosPorNomeEmailComCondicao(
+          search
+        )
+      : await this.usuarioRepository.buscarUsuariosPorCondicao(
+          filtroPorUsuarioAtivoOuNao
+        );
 
     return usuarios;
+  };
+
+  editarUsuario = async (id: string, data: TipoEditarUsuario) => {
+    const usuarioEditado = await this.usuarioRepository.editarUsuario(id, data);
+
+    return usuarioEditado;
   };
 }
 

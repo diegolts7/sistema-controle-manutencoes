@@ -7,14 +7,15 @@ import {
   TipoUsuarioPublico,
 } from "../../../core/usuario/entity/usuario.entity";
 
-const USUARIOS_ZERADOS = 0;
-
 export class UsuarioRepositoryPrisma {
+  private readonly USUARIOS_ZERADOS = 0;
+  private readonly OMIT_USUARIO_PUBLICO = { senha: true, id: true };
+
   constructor(private readonly prismaService: PrismaClient) {}
 
   existeUsuario = async (data: Partial<TipoUsuario>): Promise<boolean> => {
     const count = await this.prismaService.usuario.count({ where: data });
-    return count > USUARIOS_ZERADOS;
+    return count > this.USUARIOS_ZERADOS;
   };
 
   buscarPorId = async (id: number): Promise<TipoUsuario | null> => {
@@ -23,9 +24,12 @@ export class UsuarioRepositoryPrisma {
     });
   };
 
-  buscarPorIdExterno = async (id: string): Promise<TipoUsuario | null> => {
+  buscarPorIdExterno = async (
+    id: string
+  ): Promise<TipoUsuarioPublico | null> => {
     return await this.prismaService.usuario.findUnique({
       where: { idExterno: id },
+      omit: this.OMIT_USUARIO_PUBLICO,
     });
   };
 
@@ -37,11 +41,24 @@ export class UsuarioRepositoryPrisma {
     data: Partial<TipoUsuario> = {}
   ): Promise<TipoUsuarioPublico[]> => {
     return await this.prismaService.usuario.findMany({
-      where: data,
-      omit: {
-        senha: true,
-        id: true,
+      where: { ...data },
+      omit: this.OMIT_USUARIO_PUBLICO,
+    });
+  };
+
+  buscarUsuariosPorNomeEmailComCondicao = async (
+    search: string,
+    data: Partial<Omit<TipoUsuario, "ativo">> = {}
+  ) => {
+    return await this.prismaService.usuario.findMany({
+      where: {
+        ...data,
+        OR: [
+          { nome: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+        ],
       },
+      omit: this.OMIT_USUARIO_PUBLICO,
     });
   };
 
@@ -59,10 +76,7 @@ export class UsuarioRepositoryPrisma {
   ): Promise<TipoUsuarioPublico | null> => {
     return await this.prismaService.usuario.create({
       data,
-      omit: {
-        senha: true,
-        id: true,
-      },
+      omit: this.OMIT_USUARIO_PUBLICO,
     });
   };
 
