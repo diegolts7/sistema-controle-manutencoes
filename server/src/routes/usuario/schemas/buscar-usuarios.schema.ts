@@ -15,7 +15,7 @@ export const usuarioPublicoSchema = z.object({
   cargo: z.nativeEnum(CargoEnum),
   email: z.string().email(),
   idExterno: z.string().uuid(),
-  instituicaoId: z.number(),
+  instituicaoId: z.number().nullable(),
   ativo: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

@@ -3,13 +3,24 @@ import {
   UsuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
 import { bcryptService } from "../../../services/bcrypt/bcrypt-service";
-import { NotFoundError } from "../../../utils/helpers/api-error.helpers";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../utils/helpers/api-error.helpers";
 import { TipoCriarUsuario, TipoEditarUsuario } from "../entity/usuario.entity";
 
 export class UsuarioUseCase {
   constructor(private readonly usuarioRepository: UsuarioRepositoryPrisma) {}
 
   criarUsuario = async (usuario: TipoCriarUsuario) => {
+    const existeUsuario = await this.usuarioRepository.existeUsuario({
+      email: usuario.email,
+    });
+
+    if (existeUsuario) {
+      throw new BadRequestError("Usuario com esse email já existe");
+    }
+
     const senhaCriptografada = await bcryptService.gerarHashSenha(
       usuario.senha
     );
@@ -37,7 +48,8 @@ export class UsuarioUseCase {
 
     const usuarios = search
       ? await this.usuarioRepository.buscarUsuariosPorNomeEmailComCondicao(
-          search
+          search,
+          filtroPorUsuarioAtivoOuNao
         )
       : await this.usuarioRepository.buscarUsuariosPorCondicao(
           filtroPorUsuarioAtivoOuNao
@@ -47,6 +59,14 @@ export class UsuarioUseCase {
   };
 
   editarUsuario = async (id: string, data: TipoEditarUsuario) => {
+    const existeUsuario = await this.usuarioRepository.existeUsuario({
+      idExterno: id,
+    });
+
+    if (!existeUsuario) {
+      throw new BadRequestError("Usuario com esse id não existe no banco");
+    }
+
     const usuarioEditado = await this.usuarioRepository.editarUsuario(id, data);
 
     return usuarioEditado;

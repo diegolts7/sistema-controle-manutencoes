@@ -14,15 +14,15 @@ model Usuario {
   email         String    @unique
   senha         String
   idExterno     String    @unique @default(uuid()) @map("id_externo")
-  instituicaoId Int       @map("instituicao_id")
+  instituicaoId Int?      @map("instituicao_id")
   ativo         Boolean   @default(true)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  VinculoInstituicao        InstituicaoEnsino @relation(fields: [instituicaoId], references: [id])
+  VinculoInstituicao        InstituicaoEnsino? @relation(fields: [instituicaoId], references: [id], onDelete: SetNull)
   LaboratoriosAdministrados Laboratorio[]
-  ManutencoesSolicitadas    Manutencao[]      @relation("UsuarioSolicitou")
-  ManutencoesFeitas         Manutencao[]      @relation("TecnicoResponsavel")
+  ManutencoesSolicitadas    Manutencao[]       @relation("UsuarioSolicitou")
+  ManutencoesFeitas         Manutencao[]       @relation("TecnicoResponsavel")
 
   @@map("usuarios")
 }

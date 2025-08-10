@@ -43,12 +43,13 @@ export class UsuarioRepositoryPrisma {
     return await this.prismaService.usuario.findMany({
       where: { ...data },
       omit: this.OMIT_USUARIO_PUBLICO,
+      orderBy: { createdAt: "desc" },
     });
   };
 
   buscarUsuariosPorNomeEmailComCondicao = async (
     search: string,
-    data: Partial<Omit<TipoUsuario, "ativo">> = {}
+    data: Partial<TipoUsuario> = {}
   ) => {
     return await this.prismaService.usuario.findMany({
       where: {
@@ -59,15 +60,7 @@ export class UsuarioRepositoryPrisma {
         ],
       },
       omit: this.OMIT_USUARIO_PUBLICO,
-    });
-  };
-
-  buscarUsuariosAtivosPorCondicao = async (
-    data: Partial<Omit<TipoUsuario, "ativo">> = {}
-  ) => {
-    return await this.buscarUsuariosPorCondicao({
-      ...data,
-      ativo: true,
+      orderBy: { createdAt: "desc" },
     });
   };
 

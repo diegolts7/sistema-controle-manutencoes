@@ -7,7 +7,7 @@ export type TipoUsuario = {
   email: string;
   senha: string;
   idExterno: string;
-  instituicaoId: number;
+  instituicaoId: number | null;
   ativo: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -21,6 +21,7 @@ export type TipoCriarUsuario = Omit<
 > & {
   cargo?: CargoEnum;
   ativo?: boolean;
+  instituicaoId: number | null;
 };
 
 export type TipoEditarUsuario = Partial<TipoCriarUsuario>;
