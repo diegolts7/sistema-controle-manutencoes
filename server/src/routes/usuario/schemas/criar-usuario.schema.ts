@@ -7,7 +7,12 @@ export const criarUsuarioBody = z.object({
   nome: z.string(),
   cargo: z.nativeEnum(CargoEnum).optional().default("PROFESSOR"),
   email: z.string().email(),
-  instituicaoId: z.number(),
+  instituicaoId: z
+    .number({
+      invalid_type_error: "O id da instituição precisa ser um numero inteiro",
+      required_error: "O id da instituição é obrigatorio, podendo ser nulo",
+    })
+    .nullable(),
   ativo: z.boolean().optional().default(true),
   senha: z.string().min(8),
 });

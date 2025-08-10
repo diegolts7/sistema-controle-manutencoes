@@ -3,14 +3,18 @@ import { HTTP_STATUS } from "../../utils/constantes/status-requisicao.utils";
 import {
   instituicaoEnsinoUseCase,
   InstituicaoEnsinoUseCase,
-} from "../../core//autenticacao/instituicao-ensino/useCases/instituicao-ensino.use-case";
-import { InstituicaoEnsinoDTO, InstituicaoEnsinoUpdateDTO } from "../../routes/instituicao-ensino/schemas/instituicao-ensino.schema";
+} from "../../core/instituicao-ensino/useCases/instituicao-ensino.use-case";
+import {
+  AtualizarInstituicaoRoute,
+  BuscarIntituicaoPorIdRoute,
+  CriarInstituicaoRoute,
+} from "./interface.instituicao-ensino.controller";
 
 class InstituicaoEnsinoController {
   constructor(private readonly useCase: InstituicaoEnsinoUseCase) {}
 
   criar = async (
-    request: FastifyRequest<{ Body: InstituicaoEnsinoDTO }>,
+    request: FastifyRequest<CriarInstituicaoRoute>,
     reply: FastifyReply
   ) => {
     const data = request.body;
@@ -19,11 +23,13 @@ class InstituicaoEnsinoController {
   };
 
   buscarPorId = async (
-    request: FastifyRequest<{ Params: { id: string } }>,
+    request: FastifyRequest<BuscarIntituicaoPorIdRoute>,
     reply: FastifyReply
   ) => {
     const { id } = request.params;
+
     const instituicao = await this.useCase.buscarPorId(Number(id));
+
     reply.status(HTTP_STATUS.SUCCESS).send(instituicao);
   };
 
@@ -33,10 +39,7 @@ class InstituicaoEnsinoController {
   };
 
   atualizar = async (
-    request: FastifyRequest<{
-      Params: { id: string };
-      Body: InstituicaoEnsinoUpdateDTO;
-    }>,
+    request: FastifyRequest<AtualizarInstituicaoRoute>,
     reply: FastifyReply
   ) => {
     const { id } = request.params;
@@ -46,12 +49,14 @@ class InstituicaoEnsinoController {
   };
 
   deletar = async (
-    request: FastifyRequest<{ Params: { id: string } }>,
+    request: FastifyRequest<BuscarIntituicaoPorIdRoute>,
     reply: FastifyReply
   ) => {
     const { id } = request.params;
-    await this.useCase.deletar(Number(id));
-    reply.status(204).send();
+
+    const instituicaoDeletada = await this.useCase.deletar(Number(id));
+
+    reply.status(HTTP_STATUS.SUCCESS).send(instituicaoDeletada);
   };
 }
 
