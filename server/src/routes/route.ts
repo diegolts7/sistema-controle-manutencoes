@@ -12,10 +12,11 @@ import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
 import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.route";
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
+import { usuarioRotas } from "./usuario/usuario.route";
 
 const app = fastify({
   logger: true,
-}).withTypeProvider<ZodTypeProvider>();
+});
 
 app.register(fastifyCors, {
   origin: "*",
@@ -24,6 +25,7 @@ app.register(fastifyCors, {
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.withTypeProvider<ZodTypeProvider>();
 
 app.register(fastifySwagger, {
   openapi: {
@@ -58,6 +60,7 @@ app.register(fastifyJwt, {
 const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
   app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
+  app.register(usuarioRotas, { prefix: "/user" });
 };
 
 app.register(routes, { prefix: "/api" });

@@ -1,23 +1,28 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ConteudoLogin } from "../../routes/autenticacao/schemas/login.schema";
 import { HTTP_STATUS } from "../../utils/constantes/status-requisicao.utils";
 import {
   autenticacaoUseCase,
   AutenticacaoUseCase,
 } from "../../core/autenticacao/useCases/autenticacao.use-case";
-import { ConteudoVerificarToken } from "../../routes/autenticacao/schemas/verificar-token.schema";
 import { verificarSeTokenEhValido } from "../../middlewares/auth/verificar-token";
-import { ConteudoAtualizarToken } from "../../routes/autenticacao/schemas/atualizar-token.schema";
+import {
+  AtualizarTokenRoute,
+  LoginRoute,
+  VerificarTokenRoute,
+} from "./interface.autenticacao.controller";
+import {
+  UsuarioUseCase,
+  usuarioUseCase,
+} from "../../core/usuario/useCases/usuario.use-case";
+import { Payload } from "../../core/autenticacao/entity/autenticacao.entity";
 
 class AutenticacaoController {
-  constructor(private readonly autenticacaoUseCase: AutenticacaoUseCase) {}
+  constructor(
+    private readonly autenticacaoUseCase: AutenticacaoUseCase,
+    private readonly usuarioUseCase: UsuarioUseCase
+  ) {}
 
-  login = async (
-    request: FastifyRequest<{
-      Body: ConteudoLogin;
-    }>,
-    reply: FastifyReply
-  ) => {
+  login = async (request: FastifyRequest<LoginRoute>, reply: FastifyReply) => {
     const { email, senha } = request.body;
 
     const tokens = await this.autenticacaoUseCase.login({ email, senha });
@@ -26,7 +31,7 @@ class AutenticacaoController {
   };
 
   verificarToken = async (
-    request: FastifyRequest<{ Body: ConteudoVerificarToken }>,
+    request: FastifyRequest<VerificarTokenRoute>,
     reply: FastifyReply
   ) => {
     const { access } = request.body;
@@ -37,7 +42,7 @@ class AutenticacaoController {
   };
 
   atualizarToken = async (
-    request: FastifyRequest<{ Body: ConteudoAtualizarToken }>,
+    request: FastifyRequest<AtualizarTokenRoute>,
     reply: FastifyReply
   ) => {
     const { refresh } = request.body;
@@ -46,8 +51,20 @@ class AutenticacaoController {
 
     reply.status(HTTP_STATUS.SUCCESS).send(novosTokens);
   };
+
+  buscarUsuarioLogado = async (
+    request: FastifyRequest,
+    reply: FastifyReply
+  ) => {
+    const { userId } = request.user as Payload;
+
+    const usuarioLogado = await this.usuarioUseCase.buscarUsuarioPorId(userId);
+
+    reply.status(HTTP_STATUS.SUCCESS).send(usuarioLogado);
+  };
 }
 
 export const autenticacaoController = new AutenticacaoController(
-  autenticacaoUseCase
+  autenticacaoUseCase,
+  usuarioUseCase
 );
