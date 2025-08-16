@@ -1,23 +1,22 @@
 export type CargoEnum = "PROFESSOR" | "TECNICO" | "COORDENADOR";
 
 export type TipoUsuario = {
-  id: number;
+  id: string;
   nome: string;
   cargo: CargoEnum;
   email: string;
   senha: string;
-  idExterno: string;
   instituicaoId: number | null;
   ativo: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export type TipoUsuarioPublico = Omit<TipoUsuario, "id" | "senha">;
+export type TipoUsuarioPublico = Omit<TipoUsuario, "senha">;
 
 export type TipoCriarUsuario = Omit<
   TipoUsuario,
-  "id" | "idExterno" | "createdAt" | "updatedAt" | "VinculoInstituicao"
+  "id" | "createdAt" | "updatedAt" | "cargo" | "ativo"
 > & {
   cargo?: CargoEnum;
   ativo?: boolean;

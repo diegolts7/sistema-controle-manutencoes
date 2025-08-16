@@ -11,10 +11,10 @@ const queryBuscarUsuarios = z.object({
 });
 
 export const usuarioPublicoSchema = z.object({
+  id: z.string().uuid(),
   nome: z.string(),
   cargo: z.nativeEnum(CargoEnum),
   email: z.string().email(),
-  idExterno: z.string().uuid(),
   instituicaoId: z.number().nullable(),
   ativo: z.boolean(),
   createdAt: z.coerce.date(),

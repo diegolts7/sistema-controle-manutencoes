@@ -14,7 +14,7 @@ export const criarUsuarioBody = z.object({
     })
     .nullable(),
   ativo: z.boolean().optional().default(true),
-  senha: z.string().min(8),
+  senha: z.string().min(8, "senha muito curta"),
 });
 
 export const criarUsuarioSchema: FastifySchema = {

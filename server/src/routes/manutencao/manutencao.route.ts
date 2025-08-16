@@ -1,15 +1,17 @@
 import { FastifyTypedInstance } from "../../@types/fastify/fastify.types";
+import { manutencaoController } from "../../controller/manutencao/manutencao.controller";
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
 import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-cargo.middleware";
+import { criarManutencaoSchema } from "./schemas/criar-manutencao.schema";
 
 export const manutencaoRotas = (app: FastifyTypedInstance) => {
   app.post(
     "/",
     {
-      schema: {},
+      schema: criarManutencaoSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    () => {}
+    manutencaoController.solicitar
   );
 
   app.get(
@@ -99,7 +101,7 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
     () => {}
   );
 
-  app.delete(
+  app.patch(
     "/cancelar/:id",
     {
       schema: {},

@@ -26,6 +26,8 @@ export const errorMiddleware = (
       .send({ errors: errosSemOCaminho });
   }
 
+  console.log(error);
+
   const statusCode = error.statusCode ?? HTTP_STATUS.INTERNAL_ERROR;
   const message = error.statusCode ? error.message : "Erro interno do servidor";
 
