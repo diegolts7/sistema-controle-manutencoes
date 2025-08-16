@@ -12,6 +12,7 @@ import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 import { usuarioRotas } from "./usuario/usuario.route";
+import { laboratorioRotas } from "./laboratorio/laboratorio.route";
 
 const app = fastify({
   logger: true,
@@ -59,6 +60,7 @@ app.register(fastifyJwt, {
 const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
   app.register(usuarioRotas, { prefix: "/user" });
+  app.register(laboratorioRotas, { prefix: "/laboratorios" });
 };
 
 app.register(routes, { prefix: "/api" });
