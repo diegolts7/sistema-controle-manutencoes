@@ -44,5 +44,4 @@ export const usuarioRotas = (app: FastifyTypedInstance) => {
     },
     usuarioController.editarUsuario
   );
-  //   app.patch("/desativar", () => {});
 };

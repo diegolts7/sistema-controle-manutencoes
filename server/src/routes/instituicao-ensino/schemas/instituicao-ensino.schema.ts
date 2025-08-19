@@ -92,7 +92,7 @@ export const deletarInstituicaoSchema: FastifySchema = {
   description: "Rota para deletar uma instituição de ensino",
   params: paramsInstituicaoId,
   response: {
-    200: instituicaoEnsinoSchema,
+    200: z.object({}),
   },
   security: [{ BearerAuth: [] }],
 };

@@ -54,9 +54,9 @@ class InstituicaoEnsinoController {
   ) => {
     const { id } = request.params;
 
-    const instituicaoDeletada = await this.useCase.deletar(Number(id));
+    await this.useCase.deletar(Number(id));
 
-    reply.status(HTTP_STATUS.SUCCESS).send(instituicaoDeletada);
+    reply.status(HTTP_STATUS.SUCCESS).send();
   };
 }
 

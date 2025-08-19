@@ -13,6 +13,7 @@ import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 import { usuarioRotas } from "./usuario/usuario.route";
+import { manutencaoRotas } from "./manutencao/manutencao.route";
 
 const app = fastify({
   logger: true,
@@ -61,6 +62,7 @@ const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
   app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
   app.register(usuarioRotas, { prefix: "/user" });
+  app.register(manutencaoRotas, { prefix: "/manutencao" });
 };
 
 app.register(routes, { prefix: "/api" });

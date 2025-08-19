@@ -33,8 +33,8 @@ export class UsuarioUseCase {
     return usuarioCriado;
   };
 
-  buscarUsuarioPorId = async (idExterno: string) => {
-    const usuario = await this.usuarioRepository.buscarPorIdExterno(idExterno);
+  buscarUsuarioPorId = async (id: string) => {
+    const usuario = await this.usuarioRepository.buscarPorId(id);
 
     if (!usuario) {
       throw new NotFoundError("Usuario com esse id não existe no banco.");
@@ -60,7 +60,7 @@ export class UsuarioUseCase {
 
   editarUsuario = async (id: string, data: TipoEditarUsuario) => {
     const existeUsuario = await this.usuarioRepository.existeUsuario({
-      idExterno: id,
+      id: id,
     });
 
     if (!existeUsuario) {
