@@ -56,6 +56,38 @@ class ManutencaoController {
 
     reply.status(HTTP_STATUS.SUCCESS).send(manutencao);
   };
+
+  buscarParaTecnico = async (
+    request: FastifyRequest<BuscarManutencoesRoute>,
+    reply: FastifyReply
+  ) => {
+    const filtrosBusca = request.query;
+    const { userId } = request.user as Payload;
+
+    const manutencoes =
+      await this.manutencaoUseCase.buscarManutencoesParaTecnico(
+        userId,
+        filtrosBusca
+      );
+
+    reply.status(HTTP_STATUS.SUCCESS).send(manutencoes);
+  };
+
+  buscarSolicitadas = async (
+    request: FastifyRequest<BuscarManutencoesRoute>,
+    reply: FastifyReply
+  ) => {
+    const filtrosBusca = request.query;
+    const { userId } = request.user as Payload;
+
+    const manutencoes =
+      await this.manutencaoUseCase.buscarManutencoesSolicitadas(
+        userId,
+        filtrosBusca
+      );
+
+    reply.status(HTTP_STATUS.SUCCESS).send(manutencoes);
+  };
 }
 
 export const manutencaoController = new ManutencaoController(manutencaoUseCase);

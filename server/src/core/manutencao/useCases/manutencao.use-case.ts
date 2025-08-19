@@ -8,7 +8,10 @@ import {
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
 import { QueryParamsBuscarManutencoes } from "../../../routes/manutencao/schemas/buscar-manutencoes.schema";
 import { BadRequestError } from "../../../utils/helpers/api-error.helpers";
-import { TipoManutencaoRecebidoNaCriacao } from "../entity/manutencao.entity";
+import {
+  TipoManutencao,
+  TipoManutencaoRecebidoNaCriacao,
+} from "../entity/manutencao.entity";
 
 export class ManutencaoUseCase {
   constructor(
@@ -37,7 +40,7 @@ export class ManutencaoUseCase {
   buscarManutencoes = async ({
     complemento,
     ...filtrosAdicionais
-  }: QueryParamsBuscarManutencoes) => {
+  }: QueryParamsBuscarManutencoes & Partial<TipoManutencao>) => {
     const manutencoes =
       await this.manutencaoRepository.buscarManutencoesPorCondicao(
         filtrosAdicionais,
@@ -58,9 +61,31 @@ export class ManutencaoUseCase {
       );
     }
 
-    console.log(manutencao);
-
     return manutencao;
+  };
+
+  buscarManutencoesParaTecnico = async (
+    idTecnico: string,
+    filtrosBusca: QueryParamsBuscarManutencoes
+  ) => {
+    const manutencoes = await this.buscarManutencoes({
+      ...filtrosBusca,
+      tecnicoResponsavelId: idTecnico,
+    });
+
+    return manutencoes;
+  };
+
+  buscarManutencoesSolicitadas = async (
+    idResponsavelPorSolicitar: string,
+    filtrosBusca: QueryParamsBuscarManutencoes
+  ) => {
+    const manutencoes = await this.buscarManutencoes({
+      ...filtrosBusca,
+      usuarioSolicitacaoId: idResponsavelPorSolicitar,
+    });
+
+    return manutencoes;
   };
 }
 

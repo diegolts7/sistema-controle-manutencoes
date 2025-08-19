@@ -5,7 +5,7 @@ import { StatusManutencao, TipoManutencao } from "@prisma/client";
 import { booleanNaUriSchema } from "../../usuario/schemas/buscar-usuarios.schema";
 import { schemaManutencaoComRelacionamentos } from "./buscar-manutencao-por-id.schema";
 
-const queryParamsBuscarManutencoesSchema = z.object({
+export const queryParamsBuscarManutencoesSchema = z.object({
   status: z.nativeEnum(StatusManutencao).optional().default("SOLICITADA"),
   tipo: z.nativeEnum(TipoManutencao).optional(),
   complemento: booleanNaUriSchema,

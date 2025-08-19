@@ -3,6 +3,8 @@ import { manutencaoController } from "../../controller/manutencao/manutencao.con
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
 import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-cargo.middleware";
 import { buscarManutencaoPorIdSchema } from "./schemas/buscar-manutencao-por-id.schema";
+import { buscarManutencaoParaTecnicoSchema } from "./schemas/buscar-manutencoes-para-tecnico.schema";
+import { buscarManutencoesSolicitadasSchema } from "./schemas/buscar-manutencoes-solicitadas.schema";
 import { buscarManutencaoSchema } from "./schemas/buscar-manutencoes.schema";
 import { criarManutencaoSchema } from "./schemas/criar-manutencao.schema";
 
@@ -34,43 +36,46 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
     manutencaoController.buscarPorId
   );
 
+  // app.get(
+  //   "/laboratorio/:idLaboratorio",
+  //   {
+  //     schema: {},
+  //     preHandler: [tokenValidoMiddleware],
+  //   },
+  //   () => {}
+  // );
+
+  // app.get(
+  //   "/tecnico/:idTecnico",
+  //   {
+  //     schema: {},
+  //     preHandler: [tokenValidoMiddleware],
+  //   },
+  //   () => {}
+  // );
+
   app.get(
-    "/laboratorio/:idLaboratorio",
+    "/tecnico",
     {
-      schema: {},
-      preHandler: [tokenValidoMiddleware],
+      schema: buscarManutencaoParaTecnicoSchema,
+      preHandler: [
+        tokenValidoMiddleware,
+        verificarCargoMiddleware(["TECNICO"]),
+      ],
     },
-    () => {}
+    manutencaoController.buscarParaTecnico
   );
 
   app.get(
-    "/tecnico/:idTecnico",
+    "/solicitadas",
     {
-      schema: {},
-      preHandler: [tokenValidoMiddleware],
-    },
-    () => {}
-  );
-
-  app.get(
-    "/para-tecnico",
-    {
-      schema: {},
-      preHandler: [tokenValidoMiddleware],
-    },
-    () => {}
-  );
-
-  app.get(
-    "/criadas",
-    {
-      schema: {},
+      schema: buscarManutencoesSolicitadasSchema,
       preHandler: [
         tokenValidoMiddleware,
         verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
       ],
     },
-    () => {}
+    manutencaoController.buscarSolicitadas
   );
 
   app.patch(
@@ -89,7 +94,10 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
     "/concluir-manutencao/:id",
     {
       schema: {},
-      preHandler: [tokenValidoMiddleware],
+      preHandler: [
+        tokenValidoMiddleware,
+        verificarCargoMiddleware(["COORDENADOR", "TECNICO"]),
+      ],
     },
     () => {}
   );
@@ -100,7 +108,7 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
       schema: {},
       preHandler: [
         tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
+        verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
       ],
     },
     () => {}
