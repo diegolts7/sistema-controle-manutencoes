@@ -2,6 +2,8 @@ import { FastifyTypedInstance } from "../../@types/fastify/fastify.types";
 import { manutencaoController } from "../../controller/manutencao/manutencao.controller";
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
 import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-cargo.middleware";
+import { buscarManutencaoPorIdSchema } from "./schemas/buscar-manutencao-por-id.schema";
+import { buscarManutencaoSchema } from "./schemas/buscar-manutencoes.schema";
 import { criarManutencaoSchema } from "./schemas/criar-manutencao.schema";
 
 export const manutencaoRotas = (app: FastifyTypedInstance) => {
@@ -17,28 +19,19 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
   app.get(
     "/",
     {
-      schema: {},
+      schema: buscarManutencaoSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    () => {}
-  );
-
-  app.get(
-    "/prazo",
-    {
-      schema: {},
-      preHandler: [tokenValidoMiddleware],
-    },
-    () => {}
+    manutencaoController.buscar
   );
 
   app.get(
     "/:idManutencao",
     {
-      schema: {},
+      schema: buscarManutencaoPorIdSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    () => {}
+    manutencaoController.buscarPorId
   );
 
   app.get(

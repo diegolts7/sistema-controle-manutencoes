@@ -6,6 +6,7 @@ import {
   UsuarioRepositoryPrisma,
   usuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
+import { QueryParamsBuscarManutencoes } from "../../../routes/manutencao/schemas/buscar-manutencoes.schema";
 import { BadRequestError } from "../../../utils/helpers/api-error.helpers";
 import { TipoManutencaoRecebidoNaCriacao } from "../entity/manutencao.entity";
 
@@ -31,6 +32,35 @@ export class ManutencaoUseCase {
     });
 
     return manutencaoCriada;
+  };
+
+  buscarManutencoes = async ({
+    complemento,
+    ...filtrosAdicionais
+  }: QueryParamsBuscarManutencoes) => {
+    const manutencoes =
+      await this.manutencaoRepository.buscarManutencoesPorCondicao(
+        filtrosAdicionais,
+        complemento
+      );
+
+    return manutencoes;
+  };
+
+  buscarManutencaoPorId = async (id: number) => {
+    const manutencao = await this.manutencaoRepository.buscarManutencaoPorId(
+      id
+    );
+
+    if (!manutencao) {
+      throw new BadRequestError(
+        "Manutenção com esse identificador não existe."
+      );
+    }
+
+    console.log(manutencao);
+
+    return manutencao;
   };
 }
 

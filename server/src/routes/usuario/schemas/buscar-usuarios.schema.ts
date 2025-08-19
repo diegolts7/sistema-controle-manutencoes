@@ -2,12 +2,15 @@ import { CargoEnum } from "@prisma/client";
 import { FastifySchema } from "fastify";
 import { z } from "zod";
 
+export const booleanNaUriSchema = z
+  .string()
+  .optional()
+  .default("false")
+  .transform((valor) => valor === "true");
+
 const queryBuscarUsuarios = z.object({
   search: z.string().optional(),
-  inativos: z
-    .string()
-    .optional()
-    .transform((valor) => valor === "true"),
+  inativos: booleanNaUriSchema,
 });
 
 export const usuarioPublicoSchema = z.object({

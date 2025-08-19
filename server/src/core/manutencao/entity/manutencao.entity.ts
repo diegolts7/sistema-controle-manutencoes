@@ -15,6 +15,20 @@ export type TipoManutencao = {
   updatedAt: Date;
 };
 
+export type TipoUsuarioLaboratorioNaManutencao = {
+  id: number | string;
+  nome: string;
+};
+
+export type TipoManutencaoComUsuariosEvidentes = Omit<
+  TipoManutencao,
+  "usuarioSolicitacaoId" | "tecnicoResponsavelId" | "laboratorioId"
+> & {
+  UsuarioSolicitou: TipoUsuarioLaboratorioNaManutencao;
+  TecnicoResponsavel: TipoUsuarioLaboratorioNaManutencao;
+  LaboratorioManutencao: TipoUsuarioLaboratorioNaManutencao;
+};
+
 export type TipoCriarManutencao = Omit<
   TipoManutencao,
   "id" | "descricaoAposFinalizada" | "dataSolicitada" | "updatedAt" | "status"
