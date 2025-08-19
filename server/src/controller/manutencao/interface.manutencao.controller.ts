@@ -16,16 +16,14 @@ export interface BuscarManutencoesRoute extends RouteGenericInterface {
   Querystring: QueryParamsBuscarManutencoes;
 }
 
-export interface BuscarManutencaoPorIdRoute extends RouteGenericInterface {
+export interface ParamsIdRoute extends RouteGenericInterface {
   Params: ParamsIdNumber;
 }
 
-export interface EditarManutencaoRoute extends RouteGenericInterface {
-  Params: ParamsIdNumber;
+export interface EditarManutencaoRoute extends ParamsIdRoute {
   Body: ConteudoEditarManutencaoCoordenador | ConteudoEditarManutencaoProfessor;
 }
 
-export interface ConcluirManutencaoRoute extends RouteGenericInterface {
-  Params: ParamsIdNumber;
+export interface ConcluirManutencaoRoute extends ParamsIdRoute {
   Body: ConteudoConcluirManutencao;
 }

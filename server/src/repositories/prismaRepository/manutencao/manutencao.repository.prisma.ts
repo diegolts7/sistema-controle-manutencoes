@@ -93,6 +93,12 @@ export class ManutencaoRepositoryPrisma {
       data,
     });
   };
+
+  deletarManutencao = async (id: number): Promise<TipoManutencao | null> => {
+    return await this.prismaService.manutencao.delete({
+      where: { id },
+    });
+  };
 }
 
 export const manutencaoRepositoryPrisma = new ManutencaoRepositoryPrisma(

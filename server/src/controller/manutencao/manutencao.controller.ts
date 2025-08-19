@@ -4,11 +4,11 @@ import {
   manutencaoUseCase,
 } from "../../core/manutencao/useCases/manutencao.use-case";
 import {
-  BuscarManutencaoPorIdRoute,
   BuscarManutencoesRoute,
   ConcluirManutencaoRoute,
   CriarManutencaoRoute,
   EditarManutencaoRoute,
+  ParamsIdRoute,
 } from "./interface.manutencao.controller";
 import { Payload } from "../../core/autenticacao/entity/autenticacao.entity";
 import { HTTP_STATUS } from "../../utils/constantes/status-requisicao.utils";
@@ -51,7 +51,7 @@ class ManutencaoController {
   };
 
   buscarPorId = async (
-    request: FastifyRequest<BuscarManutencaoPorIdRoute>,
+    request: FastifyRequest<ParamsIdRoute>,
     reply: FastifyReply
   ) => {
     const { idManutencao } = request.params;
@@ -115,6 +115,30 @@ class ManutencaoController {
     );
 
     reply.status(HTTP_STATUS.SUCCESS).send(manutencaoEditada);
+  };
+
+  cancelar = async (
+    request: FastifyRequest<ParamsIdRoute>,
+    reply: FastifyReply
+  ) => {
+    const { idManutencao } = request.params;
+    const payload = request.user as Payload;
+
+    const manutencaoDesativada =
+      await this.manutencaoUseCase.cancelarManutencao(idManutencao, payload);
+
+    reply.status(HTTP_STATUS.SUCCESS).send(manutencaoDesativada);
+  };
+
+  deletar = async (
+    request: FastifyRequest<ParamsIdRoute>,
+    reply: FastifyReply
+  ) => {
+    const { idManutencao } = request.params;
+
+    await this.manutencaoUseCase.deletar(idManutencao);
+
+    reply.status(HTTP_STATUS.SUCCESS).send();
   };
 }
 

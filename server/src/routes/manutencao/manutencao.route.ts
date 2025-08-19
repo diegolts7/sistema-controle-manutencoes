@@ -5,6 +5,7 @@ import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-carg
 import { buscarManutencaoPorIdSchema } from "./schemas/buscar-manutencao-por-id.schema";
 import { buscarManutencaoRelacionadasAoUsuarioSchema } from "./schemas/buscar-manutencoes-relacionadas-usuario.schema";
 import { buscarManutencaoSchema } from "./schemas/buscar-manutencoes.schema";
+import { cancelarManutencaoSchema } from "./schemas/cancelar-manutencao.schema";
 import { concluirManutencaoSchema } from "./schemas/concluir-manutencao.schema";
 import { criarManutencaoSchema } from "./schemas/criar-manutencao.schema";
 import { editarManutencaoSchema } from "./schemas/editar-manutencao.schema";
@@ -36,24 +37,6 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
     },
     manutencaoController.buscarPorId
   );
-
-  // app.get(
-  //   "/laboratorio/:idLaboratorio",
-  //   {
-  //     schema: {},
-  //     preHandler: [tokenValidoMiddleware],
-  //   },
-  //   () => {}
-  // );
-
-  // app.get(
-  //   "/tecnico/:idTecnico",
-  //   {
-  //     schema: {},
-  //     preHandler: [tokenValidoMiddleware],
-  //   },
-  //   () => {}
-  // );
 
   app.get(
     "/minhas",
@@ -91,12 +74,24 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
   app.patch(
     "/:idManutencao/cancelar",
     {
-      schema: {},
+      schema: cancelarManutencaoSchema,
       preHandler: [
         tokenValidoMiddleware,
         verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
       ],
     },
-    () => {}
+    manutencaoController.cancelar
+  );
+
+  app.delete(
+    "/:idManutencao",
+    {
+      schema: cancelarManutencaoSchema,
+      preHandler: [
+        tokenValidoMiddleware,
+        verificarCargoMiddleware(["COORDENADOR"]),
+      ],
+    },
+    manutencaoController.deletar
   );
 };

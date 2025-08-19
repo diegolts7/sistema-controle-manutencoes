@@ -81,7 +81,7 @@ model ImagemManutencao {
   url          String
   nome         String
 
-  ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id])
+  ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([nome, manutencaoId])
   @@map("imagens_manutencao")

@@ -55,7 +55,7 @@ export class ManutencaoUseCase {
     return manutencoes;
   };
 
-  _buscarManutencaoPorIdComFuncaoAuxiliar = async <T>(
+  private buscarManutencaoPorIdComFuncaoAuxiliar = async <T>(
     id: number,
     fun: (id: number) => T
   ) => {
@@ -71,7 +71,7 @@ export class ManutencaoUseCase {
   };
 
   buscarPorIdComComplemento = async (id: number) => {
-    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
+    const manutencao = await this.buscarManutencaoPorIdComFuncaoAuxiliar(
       id,
       this.manutencaoRepository.buscarManutencaoPorIdComComplemento
     );
@@ -96,11 +96,11 @@ export class ManutencaoUseCase {
     return manutencoes;
   };
 
-  _editarManutencaoBase = async (
+  private editarManutencaoBase = async (
     id: number,
     dataManutencao: TipoEditarManutencao
   ) => {
-    await this._buscarManutencaoPorIdComFuncaoAuxiliar(id, (id) =>
+    await this.buscarManutencaoPorIdComFuncaoAuxiliar(id, (id) =>
       this.manutencaoRepository.existeManutencao({ id })
     );
 
@@ -112,16 +112,10 @@ export class ManutencaoUseCase {
     return manutencaoEditada;
   };
 
-  editarManutencao = async (
-    id: number,
-    user: Payload,
-    dataManutencao: TipoEditarManutencao
+  private professorLogadoSolicitouManutencaoOuErro = async (
+    manutencao: TipoManutencao,
+    user: Payload
   ) => {
-    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
-      id,
-      this.manutencaoRepository.buscarManutencaoPorId
-    );
-
     if (
       user.role === "PROFESSOR" &&
       manutencao.usuarioSolicitacaoId !== user.userId
@@ -130,6 +124,19 @@ export class ManutencaoUseCase {
         "O professor só pode editar uma manutenção que ele solicitou."
       );
     }
+  };
+
+  editarManutencao = async (
+    id: number,
+    user: Payload,
+    dataManutencao: TipoEditarManutencao
+  ) => {
+    const manutencao = await this.buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      this.manutencaoRepository.buscarManutencaoPorId
+    );
+
+    await this.professorLogadoSolicitouManutencaoOuErro(manutencao, user);
 
     const manutencaoEditada = await this.manutencaoRepository.editarManutencao(
       id,
@@ -144,7 +151,7 @@ export class ManutencaoUseCase {
     idTecnicoLogado: string,
     dataManutencao: TipoEditarManutencao
   ) => {
-    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
+    const manutencao = await this.buscarManutencaoPorIdComFuncaoAuxiliar(
       id,
       this.manutencaoRepository.buscarManutencaoPorId
     );
@@ -161,12 +168,35 @@ export class ManutencaoUseCase {
       );
     }
 
-    const manutencaoEditada = await this._editarManutencaoBase(id, {
+    const manutencaoEditada = await this.editarManutencaoBase(id, {
       ...dataManutencao,
       status: "CONCLUIDA",
     });
 
     return manutencaoEditada;
+  };
+
+  cancelarManutencao = async (id: number, user: Payload) => {
+    const manutencao = await this.buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      this.manutencaoRepository.buscarManutencaoPorId
+    );
+
+    await this.professorLogadoSolicitouManutencaoOuErro(manutencao, user);
+
+    if (manutencao.status !== "CANCELADA") {
+      throw new BadRequestError("Essa já está como cancelada");
+    }
+
+    const manutencaoEditada = await this.editarManutencaoBase(id, {
+      status: "CANCELADA",
+    });
+
+    return manutencaoEditada;
+  };
+
+  deletar = async (id: number) => {
+    return await this.manutencaoRepository.deletarManutencao(id);
   };
 }
 
