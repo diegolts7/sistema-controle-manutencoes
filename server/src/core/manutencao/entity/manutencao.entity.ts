@@ -20,7 +20,7 @@ export type TipoUsuarioLaboratorioNaManutencao = {
   nome: string;
 };
 
-export type TipoManutencaoComUsuariosEvidentes = Omit<
+export type TipoManutencaoComComplemento = Omit<
   TipoManutencao,
   "usuarioSolicitacaoId" | "tecnicoResponsavelId" | "laboratorioId"
 > & {
@@ -32,6 +32,13 @@ export type TipoManutencaoComUsuariosEvidentes = Omit<
 export type TipoCriarManutencao = Omit<
   TipoManutencao,
   "id" | "descricaoAposFinalizada" | "dataSolicitada" | "updatedAt" | "status"
+>;
+
+export type TipoEditarManutencao = Partial<
+  Omit<
+    TipoManutencao,
+    "id" | "dataSolicitada" | "updatedAt" | "usuarioSolicitacaoId"
+  >
 >;
 
 export type TipoManutencaoRecebidoNaCriacao = Omit<

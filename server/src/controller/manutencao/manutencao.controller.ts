@@ -6,10 +6,16 @@ import {
 import {
   BuscarManutencaoPorIdRoute,
   BuscarManutencoesRoute,
+  ConcluirManutencaoRoute,
   CriarManutencaoRoute,
+  EditarManutencaoRoute,
 } from "./interface.manutencao.controller";
 import { Payload } from "../../core/autenticacao/entity/autenticacao.entity";
 import { HTTP_STATUS } from "../../utils/constantes/status-requisicao.utils";
+import {
+  bodyEditarManutencaoCoordenador,
+  bodyEditarManutencaoProfessor,
+} from "../../routes/manutencao/schemas/editar-manutencao.schema";
 
 class ManutencaoController {
   constructor(private readonly manutencaoUseCase: ManutencaoUseCase) {}
@@ -50,43 +56,65 @@ class ManutencaoController {
   ) => {
     const { idManutencao } = request.params;
 
-    const manutencao = await this.manutencaoUseCase.buscarManutencaoPorId(
+    const manutencao = await this.manutencaoUseCase.buscarPorIdComComplemento(
       idManutencao
     );
 
     reply.status(HTTP_STATUS.SUCCESS).send(manutencao);
   };
 
-  buscarParaTecnico = async (
+  relacionadasAoUsuarioLogado = async (
     request: FastifyRequest<BuscarManutencoesRoute>,
     reply: FastifyReply
   ) => {
     const filtrosBusca = request.query;
-    const { userId } = request.user as Payload;
+    const user = request.user as Payload;
 
     const manutencoes =
       await this.manutencaoUseCase.buscarManutencoesParaTecnico(
-        userId,
+        user,
         filtrosBusca
       );
 
     reply.status(HTTP_STATUS.SUCCESS).send(manutencoes);
   };
 
-  buscarSolicitadas = async (
-    request: FastifyRequest<BuscarManutencoesRoute>,
+  editar = async (
+    request: FastifyRequest<EditarManutencaoRoute>,
     reply: FastifyReply
   ) => {
-    const filtrosBusca = request.query;
+    const payload = request.user as Payload;
+    const { idManutencao } = request.params;
+
+    const dataManutencao =
+      payload.role === "COORDENADOR"
+        ? bodyEditarManutencaoCoordenador.parse(request.body)
+        : bodyEditarManutencaoProfessor.parse(request.body);
+
+    const manutencaoEditada = await this.manutencaoUseCase.editarManutencao(
+      idManutencao,
+      payload,
+      dataManutencao
+    );
+
+    reply.status(HTTP_STATUS.SUCCESS).send(manutencaoEditada);
+  };
+
+  concluir = async (
+    request: FastifyRequest<ConcluirManutencaoRoute>,
+    reply: FastifyReply
+  ) => {
+    const { descricaoAposFinalizada } = request.body;
+    const { idManutencao } = request.params;
     const { userId } = request.user as Payload;
 
-    const manutencoes =
-      await this.manutencaoUseCase.buscarManutencoesSolicitadas(
-        userId,
-        filtrosBusca
-      );
+    const manutencaoEditada = await this.manutencaoUseCase.concluirManutencao(
+      idManutencao,
+      userId,
+      { descricaoAposFinalizada }
+    );
 
-    reply.status(HTTP_STATUS.SUCCESS).send(manutencoes);
+    reply.status(HTTP_STATUS.SUCCESS).send(manutencaoEditada);
   };
 }
 

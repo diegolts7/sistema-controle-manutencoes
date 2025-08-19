@@ -7,8 +7,13 @@ import {
   usuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
 import { QueryParamsBuscarManutencoes } from "../../../routes/manutencao/schemas/buscar-manutencoes.schema";
-import { BadRequestError } from "../../../utils/helpers/api-error.helpers";
 import {
+  BadRequestError,
+  ForbiddenError,
+} from "../../../utils/helpers/api-error.helpers";
+import { Payload } from "../../autenticacao/entity/autenticacao.entity";
+import {
+  TipoEditarManutencao,
   TipoManutencao,
   TipoManutencaoRecebidoNaCriacao,
 } from "../entity/manutencao.entity";
@@ -50,10 +55,11 @@ export class ManutencaoUseCase {
     return manutencoes;
   };
 
-  buscarManutencaoPorId = async (id: number) => {
-    const manutencao = await this.manutencaoRepository.buscarManutencaoPorId(
-      id
-    );
+  _buscarManutencaoPorIdComFuncaoAuxiliar = async <T>(
+    id: number,
+    fun: (id: number) => T
+  ) => {
+    const manutencao = await fun(id);
 
     if (!manutencao) {
       throw new BadRequestError(
@@ -64,28 +70,103 @@ export class ManutencaoUseCase {
     return manutencao;
   };
 
+  buscarPorIdComComplemento = async (id: number) => {
+    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      this.manutencaoRepository.buscarManutencaoPorIdComComplemento
+    );
+
+    return manutencao;
+  };
+
   buscarManutencoesParaTecnico = async (
-    idTecnico: string,
+    user: Payload,
     filtrosBusca: QueryParamsBuscarManutencoes
   ) => {
+    const filtroPeloUsuario =
+      user.role === "TECNICO"
+        ? { tecnicoResponsavelId: user.userId }
+        : { usuarioSolicitacaoId: user.userId };
+
     const manutencoes = await this.buscarManutencoes({
       ...filtrosBusca,
-      tecnicoResponsavelId: idTecnico,
+      ...filtroPeloUsuario,
     });
 
     return manutencoes;
   };
 
-  buscarManutencoesSolicitadas = async (
-    idResponsavelPorSolicitar: string,
-    filtrosBusca: QueryParamsBuscarManutencoes
+  _editarManutencaoBase = async (
+    id: number,
+    dataManutencao: TipoEditarManutencao
   ) => {
-    const manutencoes = await this.buscarManutencoes({
-      ...filtrosBusca,
-      usuarioSolicitacaoId: idResponsavelPorSolicitar,
+    await this._buscarManutencaoPorIdComFuncaoAuxiliar(id, (id) =>
+      this.manutencaoRepository.existeManutencao({ id })
+    );
+
+    const manutencaoEditada = await this.manutencaoRepository.editarManutencao(
+      id,
+      dataManutencao
+    );
+
+    return manutencaoEditada;
+  };
+
+  editarManutencao = async (
+    id: number,
+    user: Payload,
+    dataManutencao: TipoEditarManutencao
+  ) => {
+    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      this.manutencaoRepository.buscarManutencaoPorId
+    );
+
+    if (
+      user.role === "PROFESSOR" &&
+      manutencao.usuarioSolicitacaoId !== user.userId
+    ) {
+      throw new ForbiddenError(
+        "O professor só pode editar uma manutenção que ele solicitou."
+      );
+    }
+
+    const manutencaoEditada = await this.manutencaoRepository.editarManutencao(
+      id,
+      dataManutencao
+    );
+
+    return manutencaoEditada;
+  };
+
+  concluirManutencao = async (
+    id: number,
+    idTecnicoLogado: string,
+    dataManutencao: TipoEditarManutencao
+  ) => {
+    const manutencao = await this._buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      this.manutencaoRepository.buscarManutencaoPorId
+    );
+
+    if (manutencao.tecnicoResponsavelId !== idTecnicoLogado) {
+      throw new ForbiddenError(
+        "Só quem pode concluir essa manutenção é o tecnico que foi demandado para ela."
+      );
+    }
+
+    if (manutencao.status !== "SOLICITADA") {
+      throw new BadRequestError(
+        "Essa manutenção não pode ser concluida já que seu status não estar mais como SOLICITADA"
+      );
+    }
+
+    const manutencaoEditada = await this._editarManutencaoBase(id, {
+      ...dataManutencao,
+      status: "CONCLUIDA",
     });
 
-    return manutencoes;
+    return manutencaoEditada;
   };
 }
 

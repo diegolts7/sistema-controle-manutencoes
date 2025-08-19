@@ -3,7 +3,7 @@ import { FastifySchema } from "fastify";
 import { z } from "zod";
 
 export const booleanNaUriSchema = z
-  .string()
+  .enum(["true", "false"])
   .optional()
   .default("false")
   .transform((valor) => valor === "true");

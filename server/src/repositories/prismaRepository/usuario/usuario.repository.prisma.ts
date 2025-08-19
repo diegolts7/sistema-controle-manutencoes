@@ -9,7 +9,6 @@ import {
 
 export class UsuarioRepositoryPrisma {
   private readonly USUARIOS_ZERADOS = 0;
-  private readonly PRIMEIRA_POSICAO = 0;
   private readonly OMIT_USUARIO_PUBLICO = { senha: true };
 
   constructor(private readonly prismaService: PrismaClient) {}

@@ -2,11 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import { prisma } from "../../../services/prisma/prisma";
 import {
   TipoCriarManutencao,
+  TipoEditarManutencao,
   TipoManutencao,
-  TipoManutencaoComUsuariosEvidentes,
+  TipoManutencaoComComplemento,
 } from "../../../core/manutencao/entity/manutencao.entity";
 
 export class ManutencaoRepositoryPrisma {
+  private readonly MANUTENCOES_ZERADOS = 0;
+
   private readonly selectInformacaoManutencaoExtra = {
     id: true,
     nome: true,
@@ -32,6 +35,13 @@ export class ManutencaoRepositoryPrisma {
 
   constructor(private readonly prismaService: PrismaClient) {}
 
+  existeManutencao = async (
+    data: Partial<TipoManutencao>
+  ): Promise<boolean> => {
+    const count = await this.prismaService.manutencao.count({ where: data });
+    return count > this.MANUTENCOES_ZERADOS;
+  };
+
   criarManutencao = async (
     manutencao: TipoCriarManutencao
   ): Promise<TipoManutencao> => {
@@ -43,7 +53,7 @@ export class ManutencaoRepositoryPrisma {
   buscarManutencoesPorCondicao = async (
     filtros?: Partial<TipoManutencao>,
     comDadosEstendidos: boolean = false
-  ): Promise<TipoManutencao[] | TipoManutencaoComUsuariosEvidentes[]> => {
+  ): Promise<TipoManutencao[] | TipoManutencaoComComplemento[]> => {
     const dadosParaEstender = comDadosEstendidos
       ? this.manutencaoComDadosEstendidos
       : {};
@@ -59,10 +69,28 @@ export class ManutencaoRepositoryPrisma {
 
   buscarManutencaoPorId = async (
     id: number
-  ): Promise<TipoManutencaoComUsuariosEvidentes | null> => {
+  ): Promise<TipoManutencao | null> => {
+    return await this.prismaService.manutencao.findUnique({
+      where: { id },
+    });
+  };
+
+  buscarManutencaoPorIdComComplemento = async (
+    id: number
+  ): Promise<TipoManutencaoComComplemento | null> => {
     return await this.prismaService.manutencao.findUnique({
       where: { id },
       ...this.manutencaoComDadosEstendidos,
+    });
+  };
+
+  editarManutencao = async (
+    id: number,
+    data: TipoEditarManutencao
+  ): Promise<TipoManutencao | null> => {
+    return await this.prismaService.manutencao.update({
+      where: { id },
+      data,
     });
   };
 }

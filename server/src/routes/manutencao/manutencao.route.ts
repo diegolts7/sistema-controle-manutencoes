@@ -3,10 +3,11 @@ import { manutencaoController } from "../../controller/manutencao/manutencao.con
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
 import { verificarCargoMiddleware } from "../../middlewares/cargo/verificar-cargo.middleware";
 import { buscarManutencaoPorIdSchema } from "./schemas/buscar-manutencao-por-id.schema";
-import { buscarManutencaoParaTecnicoSchema } from "./schemas/buscar-manutencoes-para-tecnico.schema";
-import { buscarManutencoesSolicitadasSchema } from "./schemas/buscar-manutencoes-solicitadas.schema";
+import { buscarManutencaoRelacionadasAoUsuarioSchema } from "./schemas/buscar-manutencoes-relacionadas-usuario.schema";
 import { buscarManutencaoSchema } from "./schemas/buscar-manutencoes.schema";
+import { concluirManutencaoSchema } from "./schemas/concluir-manutencao.schema";
 import { criarManutencaoSchema } from "./schemas/criar-manutencao.schema";
+import { editarManutencaoSchema } from "./schemas/editar-manutencao.schema";
 
 export const manutencaoRotas = (app: FastifyTypedInstance) => {
   app.post(
@@ -55,55 +56,40 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
   // );
 
   app.get(
-    "/tecnico",
+    "/minhas",
     {
-      schema: buscarManutencaoParaTecnicoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["TECNICO"]),
-      ],
+      schema: buscarManutencaoRelacionadasAoUsuarioSchema,
+      preHandler: [tokenValidoMiddleware],
     },
-    manutencaoController.buscarParaTecnico
+    manutencaoController.relacionadasAoUsuarioLogado
   );
 
-  app.get(
-    "/solicitadas",
+  app.patch(
+    "/:idManutencao",
     {
-      schema: buscarManutencoesSolicitadasSchema,
+      schema: editarManutencaoSchema,
       preHandler: [
         tokenValidoMiddleware,
         verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
       ],
     },
-    manutencaoController.buscarSolicitadas
+    manutencaoController.editar
   );
 
   app.patch(
-    "/:id",
+    "/:idManutencao/concluir",
     {
-      schema: {},
+      schema: concluirManutencaoSchema,
       preHandler: [
         tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
+        verificarCargoMiddleware(["TECNICO"]),
       ],
     },
-    () => {}
+    manutencaoController.concluir
   );
 
   app.patch(
-    "/concluir-manutencao/:id",
-    {
-      schema: {},
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR", "TECNICO"]),
-      ],
-    },
-    () => {}
-  );
-
-  app.patch(
-    "/cancelar/:id",
+    "/:idManutencao/cancelar",
     {
       schema: {},
       preHandler: [

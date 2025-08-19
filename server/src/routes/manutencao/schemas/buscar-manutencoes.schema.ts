@@ -6,7 +6,7 @@ import { booleanNaUriSchema } from "../../usuario/schemas/buscar-usuarios.schema
 import { schemaManutencaoComRelacionamentos } from "./buscar-manutencao-por-id.schema";
 
 export const queryParamsBuscarManutencoesSchema = z.object({
-  status: z.nativeEnum(StatusManutencao).optional().default("SOLICITADA"),
+  status: z.nativeEnum(StatusManutencao).optional(),
   tipo: z.nativeEnum(TipoManutencao).optional(),
   complemento: booleanNaUriSchema,
 });

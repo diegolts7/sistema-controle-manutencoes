@@ -8,6 +8,8 @@ export const errorMiddleware = (
   _req: FastifyRequest,
   reply: FastifyReply
 ) => {
+  console.log(error);
+
   if (error.validation) {
     const errosSemOCaminho = error.validation.reduce(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
