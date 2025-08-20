@@ -31,7 +31,7 @@ app.register(fastifyCors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
-app.register(fastifyMultipart);
+app.register(fastifyMultipart, { attachFieldsToBody: true });
 app.register(fastifyStatic, {
   root: CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
   prefix: CAMINHO_PARA_ARQUIVOS_NA_API,
@@ -75,7 +75,7 @@ const routes = () => {
   app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
   app.register(usuarioRotas, { prefix: "/user" });
   app.register(manutencaoRotas, { prefix: "/manutencao" });
-  app.register(imagemManutencaoRotas, { prefix: "/imagem/manutencao" });
+  app.register(imagemManutencaoRotas, { prefix: "/imagem" });
 };
 
 app.register(routes, { prefix: "/api" });

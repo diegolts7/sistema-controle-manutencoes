@@ -9,6 +9,12 @@ import {
 export class ImagemManutencaoRepositoryPrisma {
   constructor(private readonly prismaService: PrismaClient) {}
 
+  buscarPorId = async (id: number): Promise<TipoImagemManutencao | null> => {
+    return await this.prismaService.imagemManutencao.findUnique({
+      where: { id },
+    });
+  };
+
   criarVarias = async (
     imagensManutencao: TipoCriarImagemManutencao[]
   ): Promise<TipoImagemManutencao[]> => {

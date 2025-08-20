@@ -14,6 +14,7 @@ export const uparImagensManutencaoSchema: FastifySchema = {
   description: "Rota para subir as imagens de uma manutenção.",
   consumes: ["multipart/form-data"],
   params: paramsIdNumber,
+
   response: {
     201: z.array(imagemManutencaoCriada),
   },

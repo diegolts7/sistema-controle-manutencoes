@@ -1,9 +1,16 @@
-import { constants, createWriteStream, mkdirSync, statSync } from "fs";
+import {
+  constants,
+  createWriteStream,
+  mkdirSync,
+  statSync,
+  unlinkSync,
+} from "fs";
 import { access } from "fs/promises";
 import { join } from "path";
 import { pipeline } from "stream/promises";
 import { CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS } from "../../utils/constantes/arquivos-locais.utils";
 import { MultipartFile } from "@fastify/multipart";
+import { NotFoundError } from "../../utils/helpers/api-error.helpers";
 
 export class LocalStorageService {
   constructor(private readonly dirStorage: string) {}
@@ -22,7 +29,17 @@ export class LocalStorageService {
     };
   };
 
-  //   remove = async (filename: string) => {};
+  remove = async (filename: string): Promise<void> => {
+    const caminhoParaArquivo = join(this.dirStorage, filename);
+
+    const arquivoExiste = await this.fileExistInInitialDir(filename);
+
+    if (!arquivoExiste) {
+      throw new NotFoundError("Arquivo não existe");
+    }
+
+    unlinkSync(caminhoParaArquivo);
+  };
 
   fileExistInInitialDir = async (filename: string): Promise<boolean> => {
     try {
