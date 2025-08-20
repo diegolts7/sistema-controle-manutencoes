@@ -79,6 +79,15 @@ export class ManutencaoUseCase {
     return manutencao;
   };
 
+  verificarSeManutencaoExisteOuErro = async (id: number) => {
+    const manutencao = await this.buscarManutencaoPorIdComFuncaoAuxiliar(
+      id,
+      (id) => this.manutencaoRepository.existeManutencao({ id })
+    );
+
+    return manutencao;
+  };
+
   buscarManutencoesParaTecnico = async (
     user: Payload,
     filtrosBusca: QueryParamsBuscarManutencoes
@@ -100,9 +109,7 @@ export class ManutencaoUseCase {
     id: number,
     dataManutencao: TipoEditarManutencao
   ) => {
-    await this.buscarManutencaoPorIdComFuncaoAuxiliar(id, (id) =>
-      this.manutencaoRepository.existeManutencao({ id })
-    );
+    await this.verificarSeManutencaoExisteOuErro(id);
 
     const manutencaoEditada = await this.manutencaoRepository.editarManutencao(
       id,
