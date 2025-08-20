@@ -14,6 +14,13 @@ import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 import { usuarioRotas } from "./usuario/usuario.route";
 import { manutencaoRotas } from "./manutencao/manutencao.route";
+import { imagemManutencaoRotas } from "./imagem-manutencao/imagem-manutencao.route";
+import fastifyMultipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
+import {
+  CAMINHO_PARA_ARQUIVOS_NA_API,
+  CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+} from "../utils/constantes/arquivos-locais.utils";
 
 const app = fastify({
   logger: true,
@@ -24,6 +31,11 @@ app.register(fastifyCors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
+app.register(fastifyMultipart);
+app.register(fastifyStatic, {
+  root: CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+  prefix: CAMINHO_PARA_ARQUIVOS_NA_API,
+});
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 app.withTypeProvider<ZodTypeProvider>();
@@ -63,6 +75,7 @@ const routes = () => {
   app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
   app.register(usuarioRotas, { prefix: "/user" });
   app.register(manutencaoRotas, { prefix: "/manutencao" });
+  app.register(imagemManutencaoRotas, { prefix: "/imagem/manutencao" });
 };
 
 app.register(routes, { prefix: "/api" });

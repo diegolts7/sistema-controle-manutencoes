@@ -78,7 +78,7 @@ model Manutencao {
 model ImagemManutencao {
   id           Int    @id @default(autoincrement())
   manutencaoId Int    @map("manutencao_id")
-  url          String
+  mimetype     String
   nome         String
 
   ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
