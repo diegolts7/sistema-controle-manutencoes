@@ -2,7 +2,7 @@ export type TipoLaboratorio = {
   id: number;
   nome: string;
   descricao: string | null;
-  responsavelId: number;
+  responsavelId: string;
   createdAt: Date;
   updatedAt: Date;
 };

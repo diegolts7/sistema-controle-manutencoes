@@ -4,7 +4,7 @@ import { z } from "zod";
 const laboratorioSchema = z.object({
     nome: z.string(),
     descricao: z.string().nullable(),
-    responsavelId: z.number(),
+    responsavelId: z.string().uuid(),
     createAt: z.date(),
     updateAt: z.date()
 });
@@ -12,7 +12,7 @@ const laboratorioSchema = z.object({
 const criarLaboratorioBodySchema = z.object({
     nome: z.string({ required_error: "O nome é obrigatório" }),
     descricao: z.string().optional(),
-    responsavelId: z.number({ required_error: "O ID do responsável é obrigatório "})
+    responsavelId: z.string({ required_error: "O ID do responsável é obrigatório "}).uuid("O ID do responsável deve ser um UUID válido")
 });
 
 const editarLaboratorioBosySchema = criarLaboratorioBodySchema.partial();
