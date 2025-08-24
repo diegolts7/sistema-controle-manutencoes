@@ -2,61 +2,52 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { LaboratorioUseCase } from "../../core/laboratorio/useCases/laboratorio.use-case";
 import { laboratorioRepositoryPrisma } from "../../repositories/prismaRepository/laboratorio/laboratorio.repository.prisma";
 import { HTTP_STATUS } from "../../utils/constantes/status-requisicao.utils";
-import { Laboratorio } from "@prisma/client";
-import { TipoLaboratorioPublico } from "../../core/laboratorio/entity/laboratorio.entity";
 import { NotFoundError } from "../../utils/helpers/api-error.helpers";
-
-const paraLaboratorioPublico = (lab: Laboratorio): TipoLaboratorioPublico => {
-    return {
-        nome: lab.nome,
-        descricao: lab.descricao,
-        responsavelId: lab.responsavelId,
-        createdAt: lab.createdAt,
-        updatedAt: lab.updatedAt
-    };
-};
 
 const laboratorioUseCase = new LaboratorioUseCase(laboratorioRepositoryPrisma);
 
 class LaboratorioController {
+  criar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const novoLaboratorio = await laboratorioUseCase.criar(request.body as any);
 
-    criar = async (request: FastifyRequest, reply: FastifyReply) => {
-        const novoLaboratorio = await laboratorioUseCase.criar(request.body as any);
+    console.log(novoLaboratorio);
 
-        return reply.status(HTTP_STATUS.CREATED).send(paraLaboratorioPublico(novoLaboratorio));
-    };
+    return reply.status(HTTP_STATUS.CREATED).send(novoLaboratorio);
+  };
 
-    listar = async (request: FastifyRequest, reply: FastifyReply) => {
-        const laboratorios = await laboratorioUseCase.listar();
-        const laboratoriosPublicos = laboratorios.map(paraLaboratorioPublico);
+  listar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const laboratorios = await laboratorioUseCase.listar();
 
-        return reply.status(HTTP_STATUS.SUCCESS).send(laboratoriosPublicos);
-    };
+    return reply.status(HTTP_STATUS.SUCCESS).send(laboratorios);
+  };
 
-    detalhar = async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params as { id: number };
-        const laboratorio = await laboratorioUseCase.detalhar(id);
-        
-        if (!laboratorio) {
-            throw new NotFoundError(`Laboratório com ID ${id} não encontrado.`);
-         }
+  detalhar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: number };
+    const laboratorio = await laboratorioUseCase.detalhar(id);
 
-        return reply.status(HTTP_STATUS.SUCCESS).send(paraLaboratorioPublico(laboratorio));
-    };
+    if (!laboratorio) {
+      throw new NotFoundError(`Laboratório com ID ${id} não encontrado.`);
+    }
 
-    editar = async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params as { id: number };
-        const laboratorioAtualizado = await laboratorioUseCase.editar(id, request.body as any);
+    return reply.status(HTTP_STATUS.SUCCESS).send(laboratorio);
+  };
 
-        return reply.status(HTTP_STATUS.SUCCESS).send(paraLaboratorioPublico(laboratorioAtualizado));
-    };
+  editar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: number };
+    const laboratorioAtualizado = await laboratorioUseCase.editar(
+      id,
+      request.body as any
+    );
 
-    deletar = async (request: FastifyRequest, reply: FastifyReply) => {
-        const { id } = request.params as { id: number };
-        await laboratorioUseCase.deletar(id);
+    return reply.status(HTTP_STATUS.SUCCESS).send(laboratorioAtualizado);
+  };
 
-        return reply.status(HTTP_STATUS.SUCCESS).send();
-    };
+  deletar = async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: number };
+    await laboratorioUseCase.deletar(id);
+
+    return reply.status(HTTP_STATUS.SUCCESS).send();
+  };
 }
 
 export const laboratorioController = new LaboratorioController();
