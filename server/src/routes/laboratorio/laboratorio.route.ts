@@ -15,10 +15,10 @@ export const laboratorioRotas = (app: FastifyTypedInstance) => {
     "/",
     {
       schema: criarLaboratorioFastifySchema,
-      //   preHandler: [
-      //     tokenValidoMiddleware,
-      //     verificarCargoMiddleware(["COORDENADOR"]),
-      //   ],
+      preHandler: [
+        tokenValidoMiddleware,
+        verificarCargoMiddleware(["COORDENADOR"]),
+      ],
     },
     laboratorioController.criar
   );
