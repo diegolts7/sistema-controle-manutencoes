@@ -44,11 +44,11 @@ model Laboratorio {
   id            Int      @id @default(autoincrement())
   nome          String   @db.VarChar(50)
   descricao     String?
-  responsavelId String   @map("responsavel_id")
+  responsavelId String      @map("responsavel_id")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  Responsavel          Usuario      @relation(fields: [responsavelId], references: [id])
+  Responsavel          Usuario      @relation(fields: [responsavelId], references: [idExterno])
   ManutencoesRecebidas Manutencao[]
 
   @@map("laboratorios")

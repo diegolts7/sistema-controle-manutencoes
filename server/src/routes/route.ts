@@ -13,6 +13,7 @@ import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 import { usuarioRotas } from "./usuario/usuario.route";
+import { laboratorioRotas } from "./laboratorio/laboratorio.route";
 import { manutencaoRotas } from "./manutencao/manutencao.route";
 import { imagemManutencaoRotas } from "./imagem-manutencao/imagem-manutencao.route";
 import fastifyMultipart from "@fastify/multipart";
@@ -74,6 +75,7 @@ const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
   app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
   app.register(usuarioRotas, { prefix: "/user" });
+  app.register(laboratorioRotas, { prefix: "/laboratorios" });
   app.register(manutencaoRotas, { prefix: "/manutencao" });
   app.register(imagemManutencaoRotas, { prefix: "/imagem" });
 };
