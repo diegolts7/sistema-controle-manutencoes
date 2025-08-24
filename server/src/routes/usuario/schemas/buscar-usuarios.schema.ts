@@ -2,20 +2,23 @@ import { CargoEnum } from "@prisma/client";
 import { FastifySchema } from "fastify";
 import { z } from "zod";
 
+export const booleanNaUriSchema = z
+  .enum(["true", "false"])
+  .optional()
+  .default("false")
+  .transform((valor) => valor === "true");
+
 const queryBuscarUsuarios = z.object({
   search: z.string().optional(),
-  inativos: z
-    .string()
-    .optional()
-    .transform((valor) => valor === "true"),
+  inativos: booleanNaUriSchema,
 });
 
 export const usuarioPublicoSchema = z.object({
+  id: z.string().uuid(),
   nome: z.string(),
   cargo: z.nativeEnum(CargoEnum),
   email: z.string().email(),
-  idExterno: z.string().uuid(),
-  instituicaoId: z.number(),
+  instituicaoId: z.number().nullable(),
   ativo: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

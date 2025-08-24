@@ -9,7 +9,7 @@ import {
 
 export class UsuarioRepositoryPrisma {
   private readonly USUARIOS_ZERADOS = 0;
-  private readonly OMIT_USUARIO_PUBLICO = { senha: true, id: true };
+  private readonly OMIT_USUARIO_PUBLICO = { senha: true };
 
   constructor(private readonly prismaService: PrismaClient) {}
 
@@ -18,18 +18,9 @@ export class UsuarioRepositoryPrisma {
     return count > this.USUARIOS_ZERADOS;
   };
 
-  buscarPorId = async (id: number): Promise<TipoUsuario | null> => {
+  buscarPorId = async (id: string): Promise<TipoUsuario | null> => {
     return await this.prismaService.usuario.findUnique({
       where: { id },
-    });
-  };
-
-  buscarPorIdExterno = async (
-    id: string
-  ): Promise<TipoUsuarioPublico | null> => {
-    return await this.prismaService.usuario.findUnique({
-      where: { idExterno: id },
-      omit: this.OMIT_USUARIO_PUBLICO,
     });
   };
 
@@ -43,12 +34,13 @@ export class UsuarioRepositoryPrisma {
     return await this.prismaService.usuario.findMany({
       where: { ...data },
       omit: this.OMIT_USUARIO_PUBLICO,
+      orderBy: { createdAt: "desc" },
     });
   };
 
   buscarUsuariosPorNomeEmailComCondicao = async (
     search: string,
-    data: Partial<Omit<TipoUsuario, "ativo">> = {}
+    data: Partial<TipoUsuario> = {}
   ) => {
     return await this.prismaService.usuario.findMany({
       where: {
@@ -59,15 +51,7 @@ export class UsuarioRepositoryPrisma {
         ],
       },
       omit: this.OMIT_USUARIO_PUBLICO,
-    });
-  };
-
-  buscarUsuariosAtivosPorCondicao = async (
-    data: Partial<Omit<TipoUsuario, "ativo">> = {}
-  ) => {
-    return await this.buscarUsuariosPorCondicao({
-      ...data,
-      ativo: true,
+      orderBy: { createdAt: "desc" },
     });
   };
 
@@ -81,13 +65,38 @@ export class UsuarioRepositoryPrisma {
   };
 
   editarUsuario = async (
-    idExterno: string,
+    id: string,
     data: TipoEditarUsuario
   ): Promise<TipoUsuario | null> => {
     return await this.prismaService.usuario.update({
       data,
-      where: { idExterno },
+      where: { id },
     });
+  };
+
+  buscarIdUsuarioComMenosManutencao = async (): Promise<string | null> => {
+    const usuariosComMenosManutencoes = await prisma.usuario.findFirst({
+      where: { cargo: "TECNICO" },
+      select: {
+        id: true,
+        _count: {
+          select: {
+            ManutencoesFeitas: {
+              where: {
+                status: { in: ["SOLICITADA"] },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        ManutencoesFeitas: {
+          _count: "asc",
+        },
+      },
+    });
+
+    return usuariosComMenosManutencoes?.id || null;
   };
 
   desativarUsuario = async (id: string) => {

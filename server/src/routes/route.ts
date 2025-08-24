@@ -9,10 +9,19 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
+import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.route";
 import { errorMiddleware } from "../middlewares/error/erro.middleware";
 import fastifyJwt from "@fastify/jwt";
 import { usuarioRotas } from "./usuario/usuario.route";
 import { laboratorioRotas } from "./laboratorio/laboratorio.route";
+import { manutencaoRotas } from "./manutencao/manutencao.route";
+import { imagemManutencaoRotas } from "./imagem-manutencao/imagem-manutencao.route";
+import fastifyMultipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
+import {
+  CAMINHO_PARA_ARQUIVOS_NA_API,
+  CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+} from "../utils/constantes/arquivos-locais.utils";
 
 const app = fastify({
   logger: true,
@@ -23,6 +32,11 @@ app.register(fastifyCors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
+app.register(fastifyMultipart, { attachFieldsToBody: true });
+app.register(fastifyStatic, {
+  root: CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+  prefix: CAMINHO_PARA_ARQUIVOS_NA_API,
+});
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 app.withTypeProvider<ZodTypeProvider>();
@@ -59,8 +73,11 @@ app.register(fastifyJwt, {
 
 const routes = () => {
   app.register(autenticacaoRotas, { prefix: "/auth" });
+  app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
   app.register(usuarioRotas, { prefix: "/user" });
   app.register(laboratorioRotas, { prefix: "/laboratorios" });
+  app.register(manutencaoRotas, { prefix: "/manutencao" });
+  app.register(imagemManutencaoRotas, { prefix: "/imagem" });
 };
 
 app.register(routes, { prefix: "/api" });

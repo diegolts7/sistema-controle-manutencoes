@@ -8,21 +8,20 @@ datasource db {
 }
 
 model Usuario {
-  id            Int       @id @default(autoincrement())
+  id            String    @id @default(uuid())
   nome          String    @db.VarChar(50)
   cargo         CargoEnum @default(PROFESSOR)
   email         String    @unique
   senha         String
-  idExterno     String    @unique @default(uuid()) @map("id_externo")
-  instituicaoId Int       @map("instituicao_id")
+  instituicaoId Int?      @map("instituicao_id")
   ativo         Boolean   @default(true)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  VinculoInstituicao        InstituicaoEnsino @relation(fields: [instituicaoId], references: [id])
+  VinculoInstituicao        InstituicaoEnsino? @relation(fields: [instituicaoId], references: [id], onDelete: SetNull)
   LaboratoriosAdministrados Laboratorio[]
-  ManutencoesSolicitadas    Manutencao[]      @relation("UsuarioSolicitou")
-  ManutencoesFeitas         Manutencao[]      @relation("TecnicoResponsavel")
+  ManutencoesSolicitadas    Manutencao[]       @relation("UsuarioSolicitou")
+  ManutencoesFeitas         Manutencao[]       @relation("TecnicoResponsavel")
 
   @@map("usuarios")
 }
@@ -62,8 +61,8 @@ model Manutencao {
   tipo                    TipoManutencao   @default(CORRETIVA)
   descricaoSolicitada     String           @db.Text
   descricaoAposFinalizada String?          @db.Text
-  usuarioSolicitacaoId    Int              @map("usuario_solicitacao_id")
-  tecnicoResponsavelId    Int              @map("tecnico_responsavel_id")
+  usuarioSolicitacaoId    String           @map("usuario_solicitacao_id")
+  tecnicoResponsavelId    String           @map("tecnico_responsavel_id")
   laboratorioId           Int              @map("laboratorio_id")
   dataSolicitada          DateTime         @default(now()) @map("data_solicitada")
   updatedAt               DateTime         @updatedAt @map("updated_at")
@@ -79,10 +78,10 @@ model Manutencao {
 model ImagemManutencao {
   id           Int    @id @default(autoincrement())
   manutencaoId Int    @map("manutencao_id")
-  url          String
+  mimetype     String
   nome         String
 
-  ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id])
+  ManutencaoRetratada Manutencao @relation(fields: [manutencaoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([nome, manutencaoId])
   @@map("imagens_manutencao")
@@ -103,5 +102,4 @@ enum StatusManutencao {
   SOLICITADA
   CANCELADA
   CONCLUIDA
-  PENDENTE
 }

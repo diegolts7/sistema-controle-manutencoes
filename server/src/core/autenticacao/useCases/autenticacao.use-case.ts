@@ -38,7 +38,7 @@ export class AutenticacaoUseCase {
     }
 
     const tokens = this.createTokens({
-      userId: usuario.idExterno,
+      userId: usuario.id,
       role: usuario.cargo,
     });
 
