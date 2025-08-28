@@ -21,6 +21,17 @@ export class LaboratorioRepositoryPrisma {
         return await this.prismaService.laboratorio.update({ where: { id }, data });
     };
 
+    buscarPorNome = async (nome: string): Promise<Laboratorio | null> => {
+    return await this.prismaService.laboratorio.findFirst({
+      where: {
+        nome: {
+          equals: nome,
+          mode: "insensitive", // Garante que "Lab 1" e "lab 1" sejam considerados iguais
+        },
+      },
+    });
+  };
+
     deletar = async (id: number): Promise<Laboratorio> => {
         return await this.prismaService.laboratorio.delete({ where: { id } });
     };
