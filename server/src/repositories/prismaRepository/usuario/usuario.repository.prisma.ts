@@ -60,16 +60,7 @@ export class UsuarioRepositoryPrisma {
   ): Promise<TipoUsuarioPublico | null> => {
     return await this.prismaService.usuario.create({
       data,
-      select: {
-            id: true,
-            nome: true,
-            cargo: true,
-            email: true,
-            instituicaoId: true,
-            ativo: true,
-            createdAt: true,
-            updatedAt: true,
-        },
+      omit: this.OMIT_USUARIO_PUBLICO,
     });
   };
 

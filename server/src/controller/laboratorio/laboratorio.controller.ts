@@ -8,6 +8,7 @@ import { TipoLaboratorioPublico } from "../../core/laboratorio/entity/laboratori
 
 const paraLaboratorioPublico = (lab: Laboratorio): TipoLaboratorioPublico => {
   return {
+    id: lab.id,
     nome: lab.nome,
     descricao: lab.descricao,
     responsavelId: lab.responsavelId,
