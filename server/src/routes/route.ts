@@ -2,26 +2,46 @@ import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import fastify from "fastify";
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
+import { autenticacaoRotas } from "./autenticacao/autenticacao.route";
+import { instituicaoEnsinoRotas } from "./instituicao-ensino/instituicao-ensino.route";
+import { errorMiddleware } from "../middlewares/error/erro.middleware";
+import fastifyJwt from "@fastify/jwt";
+import { usuarioRotas } from "./usuario/usuario.route";
+import { laboratorioRotas } from "./laboratorio/laboratorio.route";
+import { manutencaoRotas } from "./manutencao/manutencao.route";
+import { imagemManutencaoRotas } from "./imagem-manutencao/imagem-manutencao.route";
+import fastifyMultipart from "@fastify/multipart";
+import fastifyStatic from "@fastify/static";
 import {
-  jsonSchemaTransform,
-  serializerCompiler,
-  validatorCompiler,
-  ZodTypeProvider,
-} from "fastify-type-provider-zod";
+  CAMINHO_PARA_ARQUIVOS_NA_API,
+  CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+} from "../utils/constantes/arquivos-locais.utils";
+import { dashboardRotas } from "./dashboard/dashboard.route";
 
 const app = fastify({
   logger: true,
-}).withTypeProvider<ZodTypeProvider>();
+});
 
+app.register(fastifyCors, {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+});
+
+app.register(fastifyMultipart, { attachFieldsToBody: true });
+app.register(fastifyStatic, {
+  root: CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
+  prefix: CAMINHO_PARA_ARQUIVOS_NA_API,
+});
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+app.withTypeProvider<ZodTypeProvider>();
 
 app.register(fastifySwagger, {
   openapi: {
     info: {
       title: "API Manutenções",
-      description:
-        "API de gerenciamento e controle de manutenções para os equipamentos e maquinas do IFPB Cajázeiras.",
+      description: "API de gerenciamento e controle de manutenções para os equipamentos e maquinas do IFPB Cajázeiras.",
       version: "1.0.0",
     },
     components: {
@@ -42,13 +62,22 @@ app.register(fastifySwaggerUi, {
   routePrefix: "/api/docs",
 });
 
-const routes = () => {};
+app.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET!,
+});
+
+const routes = () => {
+  app.register(autenticacaoRotas, { prefix: "/auth" });
+  app.register(instituicaoEnsinoRotas, { prefix: "/instituicao-ensino" });
+  app.register(usuarioRotas, { prefix: "/user" });
+  app.register(laboratorioRotas, { prefix: "/laboratorios" });
+  app.register(manutencaoRotas, { prefix: "/manutencao" });
+  app.register(imagemManutencaoRotas, { prefix: "/imagem" });
+  app.register(dashboardRotas, { prefix: "/dashboard" });
+};
 
 app.register(routes, { prefix: "/api" });
 
-app.register(fastifyCors, {
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-});
+app.setErrorHandler(errorMiddleware);
 
 export default app;
