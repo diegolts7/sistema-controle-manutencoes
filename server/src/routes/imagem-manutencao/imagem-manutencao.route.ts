@@ -6,15 +6,16 @@ import { uparImagensManutencaoSchema } from "./schemas/upar-imagem.schema";
 import { buscarImagensManutencaoSchema } from "./schemas/buscar-imagens-de-manutencao.schema";
 import { atualizarImagemManutencaoSchema } from "./schemas/atualizar-imagem.schema";
 import { deletarImagemManutencaoSchema } from "./schemas/deletar-imagem-manutencao.schema";
+import { CargoEnum } from "@prisma/client";
 
 export const imagemManutencaoRotas = (app: FastifyTypedInstance) => {
   app.post(
     "/manutencao/:idManutencao",
     {
       schema: uparImagensManutencaoSchema,
-      preHandler: [verificarCargoMiddleware(["COORDENADOR", "TECNICO"])],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR, CargoEnum.TECNICO])],
     },
-    imagemManutencaoController.upload
+    imagemManutencaoController.upload,
   );
 
   app.get(
@@ -23,30 +24,24 @@ export const imagemManutencaoRotas = (app: FastifyTypedInstance) => {
       schema: buscarImagensManutencaoSchema,
       preHandler: tokenValidoMiddleware,
     },
-    imagemManutencaoController.buscarDeUmaManutencao
+    imagemManutencaoController.buscarDeUmaManutencao,
   );
 
   app.patch(
     "/:idImagem/manutencao",
     {
       schema: atualizarImagemManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR", "TECNICO"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR, CargoEnum.TECNICO])],
     },
-    imagemManutencaoController.editar
+    imagemManutencaoController.editar,
   );
 
   app.delete(
     "/:idImagem/manutencao",
     {
       schema: deletarImagemManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR", "TECNICO"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR, CargoEnum.TECNICO])],
     },
-    imagemManutencaoController.deletar
+    imagemManutencaoController.deletar,
   );
 };

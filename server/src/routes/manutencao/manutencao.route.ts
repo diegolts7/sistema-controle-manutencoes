@@ -1,3 +1,4 @@
+import { CargoEnum } from "@prisma/client";
 import { FastifyTypedInstance } from "../../@types/fastify/fastify.types";
 import { manutencaoController } from "../../controller/manutencao/manutencao.controller";
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
@@ -17,7 +18,7 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
       schema: criarManutencaoSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    manutencaoController.solicitar
+    manutencaoController.solicitar,
   );
 
   app.get(
@@ -26,7 +27,7 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
       schema: buscarManutencaoSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    manutencaoController.buscar
+    manutencaoController.buscar,
   );
 
   app.get(
@@ -35,7 +36,7 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
       schema: buscarManutencaoPorIdSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    manutencaoController.buscarPorId
+    manutencaoController.buscarPorId,
   );
 
   app.get(
@@ -44,54 +45,42 @@ export const manutencaoRotas = (app: FastifyTypedInstance) => {
       schema: buscarManutencaoRelacionadasAoUsuarioSchema,
       preHandler: [tokenValidoMiddleware],
     },
-    manutencaoController.relacionadasAoUsuarioLogado
+    manutencaoController.relacionadasAoUsuarioLogado,
   );
 
   app.patch(
     "/:idManutencao",
     {
       schema: editarManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR, CargoEnum.PROFESSOR])],
     },
-    manutencaoController.editar
+    manutencaoController.editar,
   );
 
   app.patch(
     "/:idManutencao/concluir",
     {
       schema: concluirManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["TECNICO"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.TECNICO])],
     },
-    manutencaoController.concluir
+    manutencaoController.concluir,
   );
 
   app.patch(
     "/:idManutencao/cancelar",
     {
       schema: cancelarManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR", "PROFESSOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR, CargoEnum.PROFESSOR])],
     },
-    manutencaoController.cancelar
+    manutencaoController.cancelar,
   );
 
   app.delete(
     "/:idManutencao",
     {
       schema: cancelarManutencaoSchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR])],
     },
-    manutencaoController.deletar
+    manutencaoController.deletar,
   );
 };

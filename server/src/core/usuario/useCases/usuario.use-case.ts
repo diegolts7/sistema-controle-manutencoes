@@ -3,11 +3,8 @@ import {
   UsuarioRepositoryPrisma,
 } from "../../../repositories/prismaRepository/usuario/usuario.repository.prisma";
 import { bcryptService } from "../../../services/bcrypt/bcrypt-service";
-import {
-  BadRequestError,
-  NotFoundError,
-} from "../../../utils/helpers/api-error.helpers";
-import { TipoCriarUsuario, TipoEditarUsuario } from "../entity/usuario.entity";
+import { BadRequestError, NotFoundError } from "../../../utils/helpers/api-error.helpers";
+import { CargoEnum, TipoCriarUsuario, TipoEditarUsuario } from "../entity/usuario.entity";
 
 export class UsuarioUseCase {
   constructor(private readonly usuarioRepository: UsuarioRepositoryPrisma) {}
@@ -21,9 +18,7 @@ export class UsuarioUseCase {
       throw new BadRequestError("Usuario com esse email já existe");
     }
 
-    const senhaCriptografada = await bcryptService.gerarHashSenha(
-      usuario.senha
-    );
+    const senhaCriptografada = await bcryptService.gerarHashSenha(usuario.senha);
 
     const usuarioCriado = await this.usuarioRepository.criarUsuario({
       ...usuario,
@@ -43,17 +38,25 @@ export class UsuarioUseCase {
     return usuario;
   };
 
-  buscarUsuarios = async (search?: string, inativos: boolean = false) => {
+  buscarUsuarios = async ({
+    search,
+    inativos = false,
+    cargo,
+  }: {
+    search?: string;
+    inativos: boolean;
+    cargo?: CargoEnum;
+  }) => {
     const filtroPorUsuarioAtivoOuNao = inativos ? {} : { ativo: true };
+    const filtroPorCargoUsuario = cargo ? { cargo } : {};
+    const filtros = {
+      ...filtroPorUsuarioAtivoOuNao,
+      ...filtroPorCargoUsuario,
+    };
 
     const usuarios = search
-      ? await this.usuarioRepository.buscarUsuariosPorNomeEmailComCondicao(
-          search,
-          filtroPorUsuarioAtivoOuNao
-        )
-      : await this.usuarioRepository.buscarUsuariosPorCondicao(
-          filtroPorUsuarioAtivoOuNao
-        );
+      ? await this.usuarioRepository.buscarUsuariosPorNomeEmailComCondicao(search, filtros)
+      : await this.usuarioRepository.buscarUsuariosPorCondicao(filtros);
 
     return usuarios;
   };
