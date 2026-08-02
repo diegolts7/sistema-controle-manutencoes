@@ -11,6 +11,7 @@ export const booleanNaUriSchema = z
 const queryBuscarUsuarios = z.object({
   search: z.string().optional(),
   inativos: booleanNaUriSchema,
+  cargo: z.nativeEnum(CargoEnum).optional(),
 });
 
 export const usuarioPublicoSchema = z.object({
@@ -26,8 +27,7 @@ export const usuarioPublicoSchema = z.object({
 
 export const buscarUsuariosSchema: FastifySchema = {
   tags: ["user"],
-  description:
-    "Rota para buscar usuários do sistema podendo filtrar por nome e e-mail.",
+  description: "Rota para buscar usuários do sistema podendo filtrar por nome e e-mail.",
   querystring: queryBuscarUsuarios,
   response: {
     200: z.array(usuarioPublicoSchema),

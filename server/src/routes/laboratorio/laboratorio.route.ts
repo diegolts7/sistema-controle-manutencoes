@@ -1,3 +1,4 @@
+import { CargoEnum } from "@prisma/client";
 import { FastifyTypedInstance } from "../../@types/fastify/fastify.types";
 import { laboratorioController } from "../../controller/laboratorio/laboratorio.controller";
 import { tokenValidoMiddleware } from "../../middlewares/auth/token-valido.middleware";
@@ -15,12 +16,9 @@ export const laboratorioRotas = (app: FastifyTypedInstance) => {
     "/",
     {
       schema: criarLaboratorioFastifySchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR])],
     },
-    laboratorioController.criar
+    laboratorioController.criar,
   );
   app.get(
     "/",
@@ -28,7 +26,7 @@ export const laboratorioRotas = (app: FastifyTypedInstance) => {
       schema: listarLaboratoriosFastifySchema,
       preHandler: [tokenValidoMiddleware],
     },
-    laboratorioController.listar
+    laboratorioController.listar,
   );
   app.get(
     "/:id",
@@ -36,28 +34,22 @@ export const laboratorioRotas = (app: FastifyTypedInstance) => {
       schema: detalharLaboratorioFastifySchema,
       preHandler: [tokenValidoMiddleware],
     },
-    laboratorioController.detalhar
+    laboratorioController.detalhar,
   );
   app.put(
     "/:id",
     {
       schema: editarLaboratorioFastifySchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR])],
     },
-    laboratorioController.editar
+    laboratorioController.editar,
   );
   app.delete(
     "/:id",
     {
       schema: deletarLaboratorioFastifySchema,
-      preHandler: [
-        tokenValidoMiddleware,
-        verificarCargoMiddleware(["COORDENADOR"]),
-      ],
+      preHandler: [tokenValidoMiddleware, verificarCargoMiddleware([CargoEnum.COORDENADOR])],
     },
-    laboratorioController.deletar
+    laboratorioController.deletar,
   );
 };
