@@ -1,6 +1,7 @@
+import { Prisma } from "@prisma/client";
 import { TipoCriarLaboratorio, TipoEditarLaboratorio } from "../entity/laboratorio.entity";
 import{ LaboratorioRepositoryPrisma } from "../../../repositories/prismaRepository/laboratorio/laboratorio.repository.prisma";
-import { BadRequestError } from "../../../utils/helpers/api-error.helpers"; 
+import { BadRequestError } from "../../../utils/helpers/api-error.helpers";
 
 
 export class LaboratorioUseCase {
@@ -30,6 +31,19 @@ export class LaboratorioUseCase {
     };
 
     deletar = async (id: number) => {
-        return await this.laboratorioRepository.deletar(id);
+        try {
+            return await this.laboratorioRepository.deletar(id);
+        } catch (erro) {
+            const ehViolacaoDeChaveEstrangeira =
+                (erro instanceof Prisma.PrismaClientKnownRequestError && erro.code === "P2003") ||
+                (erro instanceof Error && erro.message.includes("foreign key constraint"));
+
+            if (ehViolacaoDeChaveEstrangeira) {
+                throw new BadRequestError(
+                    "Não é possível excluir um laboratório que possui manutenções vinculadas."
+                );
+            }
+            throw erro;
+        }
     };
 }

@@ -60,7 +60,7 @@ export const criarInstituicaoSchema: FastifySchema = {
 export const atualizarInstituicaoSchema: FastifySchema = {
   tags: ["instituicao-ensino"],
   description: "Rota para atualizar uma instituição de ensino",
-  body: instituicaoEnsinoSchema.partial(),
+  body: criarInstituicaoEnsinoSchema.partial(),
   params: paramsInstituicaoId,
   response: {
     200: instituicaoEnsinoSchema,
