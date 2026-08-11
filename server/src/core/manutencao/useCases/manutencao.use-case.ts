@@ -191,7 +191,7 @@ export class ManutencaoUseCase {
 
     await this.professorLogadoSolicitouManutencaoOuErro(manutencao, user);
 
-    if (manutencao.status !== "CANCELADA") {
+    if (manutencao.status === "CANCELADA") {
       throw new BadRequestError("Essa já está como cancelada");
     }
 
