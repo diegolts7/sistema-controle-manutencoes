@@ -5,7 +5,7 @@ import z from "zod";
 export const imagemManutencaoCriada = z.object({
   id: z.number().int(),
   manutencaoId: z.number().int(),
-  nome: z.string().uuid(),
+  nome: z.string(),
   mimetype: z.string(),
 });
 

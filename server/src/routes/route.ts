@@ -28,7 +28,7 @@ app.register(fastifyCors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
-app.register(fastifyMultipart, { attachFieldsToBody: true });
+app.register(fastifyMultipart);
 app.register(fastifyStatic, {
   root: CAMINHO_PARA_SALVAR_ARQUIVOS_LOCAIS,
   prefix: CAMINHO_PARA_ARQUIVOS_NA_API,
