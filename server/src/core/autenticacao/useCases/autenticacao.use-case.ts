@@ -48,7 +48,10 @@ export class AutenticacaoUseCase {
   atualizarToken = async (refresh: string) => {
     const payload = await verificarSeTokenEhValido(refresh);
 
-    const novosTokens = this.createTokens(payload);
+    const novosTokens = this.createTokens({
+      userId: payload.userId,
+      role: payload.role,
+    });
 
     return novosTokens;
   };
